@@ -13,10 +13,12 @@ It _always_ returns every type of storage, and falls back to others, as listed b
 
 The fallbacks are as follows:
 
-    localStorage   = localStorage   || userData    || cookieStorage || memoryStorage;
-    sessionStorage = sessionStorage || window.name || memoryStorage;
-    cookieStorage  = cookieStorage  || memoryStorage;
-    memoryStorage  = memoryStorage
+```javascript
+localStorage   = localStorage   || userData    || cookieStorage || memoryStorage;
+sessionStorage = sessionStorage || window.name || memoryStorage;
+cookieStorage  = cookieStorage  || memoryStorage;
+memoryStorage  = memoryStorage;
+```
 
 cookieStorage also supports an additional 'global' Boolean argument on all of its methods, allowing you to escape out of the 'prefix' defined, so that you may use it to fetch general cookies as well.
 
@@ -28,19 +30,27 @@ In a worst-case scenario, all of the storages are `memoryStorage`, which means t
 ### Examples
 Using callback and a custom prefix (callback supports IE7 and lower):
 
-    initStorer(function (Storer) {
-        cookieStorage  = Storer.cookieStorage;
-        memoryStorage  = Storer.memoryStorage;
-        sessionStorage = Storer.sessionStorage;
-        localStorage   = Storer.localStorage;
-    }, { 'prefix': '_MyStorage_' });
+```javascript
+initStorer(function (Storer) {
+    cookieStorage  = Storer.cookieStorage;
+    memoryStorage  = Storer.memoryStorage;
+    sessionStorage = Storer.sessionStorage;
+    localStorage   = Storer.localStorage;
+}, { 'prefix': '_MyStorage_' });
+```
 
 Using return (return does not support localStorage in IE7):
 
-    var Storer = initStorer();
+```javascript
+var Storer = initStorer();
+Storer.memoryStorage.setItem('falsey', 0);
+```
 
 ### Arguments for `initStorer`
-    initStorer([Function callback[, Object params]]);
+
+```javascript
+initStorer([Function callback[, Object params]]);
+```
 
 #### Function `callback(Object Storer)`
 The callback function to call once the storage has been initialized. In most modern browsers, it is called synchronously. In older versions of IE that require the use of userData for localStorage, it is triggered asynchronously once the page has loaded.
@@ -48,9 +58,13 @@ The callback function to call once the storage has been initialized. In most mod
 It returns an Object called Storer, which contains cookieStorage, localStorage, memoryStorage, and sessionStorage.
 
 #### Object `params`
-    {String} [prefix='']         automatic key prefix for sessionStorage and localStorage
-    {String} [default_domain=''] default domain for cookies
-    {String} [default_path='']   default path for cookies
+
+```javascript
+{
+    prefix:         String='' // automatic key prefix for sessionStorage and localStorage
+    default_domain: String='' // default domain for cookies
+    default_path:   String='' // default path for cookies
+```
 
 ### Important notice regarding dependencies
 For Internet Explorer 7 and lower, initStorer requires a function called domReady, or uses jQuery(document).ready if available. If no function is found, localStorage will silently fail and is not usable in old IE browsers. `domReady` is included in the dependencies subdirectory of this repository. _(In a future revision, this functionality may fall back to cookieStorage when no such function is present.)_
