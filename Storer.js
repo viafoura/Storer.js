@@ -264,9 +264,9 @@ function initStorer(callback, params) {
      * @return {memoryStorage}
      */
     function _createMemoryStorage() {
-        var _data  = {},
-            _keys  = [],
-            _ikey  = [];
+        var _data  = {}, // key : data
+            _keys  = [], // _keys key : _ikey key
+            _ikey  = {}; // _ikey key : _keys key
         /**
          * @namespace memoryStorage
          */
@@ -302,10 +302,7 @@ function initStorer(callback, params) {
              */
             setItem: function (key, data) {
                 if (data !== null && data !== undefined) {
-                    if (_data[key] === undefined) {
-                        _ikey[key] = _keys.push(key) - 1;
-                        _memoryStorage.length++;
-                    }
+                    _ikey[key] === undefined && (_ikey[key] = (_memoryStorage.length = _keys.push(key)) - 1);
                     return (_data[key] = data);
                 }
                 return _memoryStorage.removeItem(key);
@@ -318,8 +315,16 @@ function initStorer(callback, params) {
              */
             removeItem: function (key) {
                 var was = _data[key] !== undefined;
+                if (_ikey[key] !== undefined) {
+                    // re-reference all the keys because we've removed an item in between
+                    for (var i = _keys.length; --i > _ikey[key];) {
+                        _ikey[_keys[i]]--;
+                    }
+                    _keys.splice(_ikey[key], 1);
+                    delete _ikey[key];
+                }
                 delete _data[key];
-                was && _memoryStorage.length--;
+                _memoryStorage.length = _keys.length;
                 return was;
             },
 
@@ -332,7 +337,8 @@ function initStorer(callback, params) {
                         delete _data[i];
                     }
                 }
-                _memoryStorage.length = 0;
+                _memoryStorage.length = _keys.length = 0;
+                _ikey = {};
             }
         };
         return _memoryStorage;
@@ -841,7 +847,7 @@ function initStorer(callback, params) {
                                 setItem: function (key, data) {
                                     if (data !== null && data !== undefined) {
                                         el.setAttribute(_esc(key), data);
-                                        _ikey[key] = (userData.length = _keys.push(key)) - 1;
+                                        _ikey[key] === undefined && (_ikey[key] = (userData.length = _keys.push(key)) - 1);
                                         el.save(_PREFIX + _NAME);
                                         return (_data[key] = data);
                                     }
@@ -855,7 +861,7 @@ function initStorer(callback, params) {
                                  */
                                 removeItem: function (key) {
                                     el.removeAttribute(_esc(key));
-                                    if (_ikey[key]) {
+                                    if (_ikey[key] !== undefined) {
                                         // re-reference all the keys because we've removed an item in between
                                         for (var i = _keys.length; --i > _ikey[key];) {
                                             _ikey[_keys[i]]--;
