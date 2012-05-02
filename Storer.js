@@ -735,9 +735,11 @@ function initStorer(callback, params) {
         }
 
         // Rewire functions to use a prefix and avoid collisions
+        // @todo Rewire length for prefixes as well
         _sessionStorage._getItem    = _sessionStorage.getItem;
         _sessionStorage._setItem    = _sessionStorage.setItem;
         _sessionStorage._removeItem = _sessionStorage.removeItem;
+        _sessionStorage._key        = _sessionStorage.key;
 
         _sessionStorage.getItem    = function (key) {
             return _sessionStorage._getItem(PREFIX + key);
@@ -748,9 +750,16 @@ function initStorer(callback, params) {
         _sessionStorage.removeItem = function (key) {
             return _sessionStorage._removeItem(PREFIX + key);
         };
+        _sessionStorage.key        = function (index) {
+            if ((index = _sessionStorage._key(index)) !== undefined && index !== null) {
+                // Chop off the index
+                return index.indexOf(PREFIX) === 0 ? index.substr(PREFIX.length) : index;
+            }
+            return null;
+        };
         _sessionStorage.clear      = function () {
             for (var i = _sessionStorage.length, j; i--;) {
-                if ((j = _sessionStorage.key(i)).indexOf(PREFIX) === 0) {
+                if ((j = _sessionStorage._key(i)).indexOf(PREFIX) === 0) {
                     _sessionStorage._removeItem(j);
                 }
             }
@@ -962,9 +971,11 @@ function initStorer(callback, params) {
         }
 
         // Rewire functions to use a prefix and avoid collisions
+        // @todo Rewire length for prefixes as well
         _localStorage._getItem    = _localStorage.getItem;
         _localStorage._setItem    = _localStorage.setItem;
         _localStorage._removeItem = _localStorage.removeItem;
+        _localStorage._key        = _localStorage.key;
 
         _localStorage.getItem    = function (key) {
             return _localStorage._getItem(PREFIX + key);
@@ -975,9 +986,16 @@ function initStorer(callback, params) {
         _localStorage.removeItem = function (key) {
             return _localStorage._removeItem(PREFIX + key);
         };
+        _localStorage.key        = function (index) {
+            if ((index = _localStorage._key(index)) !== undefined && index !== null) {
+                // Chop off the index
+                return index.indexOf(PREFIX) === 0 ? index.substr(PREFIX.length) : index;
+            }
+            return null;
+        };
         _localStorage.clear      = function () {
             for (var i = _localStorage.length, j; i--;) {
-                if ((j = _localStorage.key(i)).indexOf(PREFIX) === 0) {
+                if ((j = _localStorage._key(i)).indexOf(PREFIX) === 0) {
                     _localStorage._removeItem(j);
                 }
             }
