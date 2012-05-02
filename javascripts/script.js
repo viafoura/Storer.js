@@ -14,7 +14,7 @@
                 $(this).parent().prev('input').val(scr.indexOf('return') === -1 ? '' : typeof result + ': ' + result);
             });
         });
-    }, { prefix: 'StorerDemo' });
+    }, { prefix: 'StorerDemo_' });
 
     $(document).ready(function () {
         prettyPrint();
