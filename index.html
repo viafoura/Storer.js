@@ -1,143 +1,314 @@
 <!doctype html>
 <!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
 <!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
-  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+    <link rel="stylesheet" href="//twitter.github.com/bootstrap/assets/css/bootstrap.css" media="screen" />
+    <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src=//google-code-prettify.googlecode.com/svn/trunk/src/prettify.js></script>
+    <script src=//raw.github.com/viafoura/Storer.js/master/Storer.min.js type="text/javascript"></script>
+    <script src="javascripts/script.js"></script>
 
-  <title>Storer.js</title>
-  <meta name="description" content="Storer.js - HTML5 Web Storage for Any Browser">
+    <title>Storer.js</title>
+    <meta name="description" content="Storer.js - HTML5 Web Storage for Any Browser">
 
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-
+    <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 
 <body>
 
-  <div class="wrapper">
-    <header>
-      <h1 class="title">Storer.js</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">Storer.js - HTML5 Web Storage for Any Browser</p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/viafoura/Storer.js/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/viafoura/Storer.js/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/viafoura/Storer.js" class="code">View Storer.js on GitHub</a>
-        </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <h1>Storer.js - HTML5 Web Storage for Any Browser</h1>
+    <div class="wrapper">
+        <header>
+            <h1 class="title">Storer.js</h1>
+        </header>
+        <div id="container">
+            <p class="tagline">Storer.js - HTML5 Web Storage for Any Browser</p>
 
-<p>Originally written for <a href="http://viafoura.com/" title="Viafoura is an audience engagement platform for publishers">Viafoura</a> by <a href="https://github.com/shahyar">Shahyar G</a>, released for public consumption by Viafoura, Inc.</p>
+            <div id="main" role="main">
+                <div class="download-bar">
+                    <div class="inner">
+                        <a href="https://github.com/viafoura/Storer.js/tarball/master" class="download-button tar"><span>Download</span></a>
+                        <a href="https://github.com/viafoura/Storer.js/zipball/master" class="download-button zip"><span>Download</span></a>
+                        <a href="https://github.com/viafoura/Storer.js" class="code">View Storer.js on GitHub</a>
+                    </div>
+                    <span class="blc"></span><span class="trc"></span>
+                </div>
+                <article class="markdown-body">
+<h1>Storer.js - HTML5 Web Storage for Any Browser</h1>
+
+<p>Originally written for <a href="http://viafoura.com/"
+                             title="Viafoura is an audience engagement platform for publishers">Viafoura</a>
+    by <a href="https://github.com/shahyar">Shahyar G</a>, released for public consumption by Viafoura,
+    Inc.</p>
 
 <h2>Introduction</h2>
 
-<p>Storer.js is a fallback-reliant, HTML5 Storage-based storage system. It implements a completely cross-browser-compatible system with implementations of <code>localStorage</code>, <code>sessionStorage</code>, <code>cookieStorage</code>, and <code>memoryStorage</code>.</p>
-
-<p>All of its storage subsystems implement <code>getItem</code>, <code>setItem</code>, <code>removeItem</code>, <code>clear</code>, <code>key</code>, and <code>length</code>, as the HTML5 Web Storage specification is written. However, there are some enhancements on these methods, and slight deviations from it with <code>memoryStorage</code> and <code>cookieStorage</code>.</p>
+    <p>Storer.js is a JavaScript library that implements cross-browser support for four storage subsystems: <code>localStorage</code>, <code>sessionStorage</code>, <code>cookieStorage</code>, and <code>memoryStorage</code>.</p>
+    <p>Based upon the HTML5 Web Storage specification, it allows you to use localStorage and sessionStorage in almost any relatively modern browser, including Internet Explorer 6+.</p>
+    <p>All of its storage subsystems implement <code>getItem</code>, <code>setItem</code>, <code>removeItem</code>, <code>clear</code>, <code>key</code>, and <code>length</code>, as the HTML5 Web Storage specification is written. However, there are some enhancements on these methods, and slight deviations from it with <code>memoryStorage</code> and <code>cookieStorage</code>.</p>
 
 <h2>How it works</h2>
+    <p>It piggybacks on the real HTML5 storage when available, and creates the additional functionality of being able to prepend a 'prefix' to all key names automatically (see initStorer params). This is useful for projects where you would like to use Storage without worrying about name collisions.</p>
+    <p>It <em>always</em> returns every type of storage, and falls back to others, as listed below. For example, if a browser does not support cookies, it will fall back to memoryStorage. The fallbacks are as follows:</p>
 
-<p>It piggybacks on the real HTML5 storage when available, and creates the additional functionality of being able to prepend a 'prefix' to all key names automatically (see initStorer params). This is useful for projects where you would like to use Storage without worrying about name collisions.</p>
-
-<p>It <em>always</em> returns every type of storage, and falls back to others, as listed below. In the worst-case scenario, all the storage subsystems are instances of memoryStorage, which means no persistance is available, but that no code will break while performing actions on the current page.</p>
-
-<p>The fallbacks are as follows:</p>
-
-<pre><code>localStorage   = localStorage   || userData    || cookieStorage || memoryStorage;
+    <pre class="prettyprint linenums">localStorage   = localStorage   || userData    || cookieStorage || memoryStorage;
 sessionStorage = sessionStorage || window.name || memoryStorage;
 cookieStorage  = cookieStorage  || memoryStorage;
-memoryStorage  = memoryStorage
-</code></pre>
+memoryStorage  = memoryStorage; // non-persistent</pre>
 
-<p>cookieStorage also supports an additional 'global' Boolean argument on all of its methods, allowing you to escape out of the 'prefix' defined, so that you may use it to fetch general cookies as well.</p>
+    <p><code>cookieStorage</code> also supports an additional '<code>global</code>' Boolean argument on all of its methods, allowing you to escape out of the 'prefix' defined, so that you may use it to fetch general cookies as well.</p>
 
 <h2>Usage</h2>
 
-<p><code>initStorer</code> is called, takes a callback function, which will return the storage subsystems. Why? This is necessary because the Internet Explorer 7- fallback for <code>localStorage</code> is <code>userData</code>, which needs to be able to insert an element into the document before proceeding. On any modern (or non-IE7) browser, the callback function is triggered synchronously and immediately. There is no delay at all in this scenario. <strong>domReady or jQuery is required for userData functionality in IE7 or lower.</strong></p>
+    <p><code>initStorer</code> is called, takes a callback function, which will return the storage subsystems. Why? This is necessary because the Internet Explorer 7- fallback for <code>localStorage</code> is <code>userData</code>, which needs to be able to insert an element into the document before proceeding. On any modern (or non-IE7) browser, the callback function is triggered synchronously and immediately. There is no delay at all in this scenario. <strong>domReady or jQuery is required for userData functionality in IE7 or lower.</strong></p>
+    <p>In a worst-case scenario, all of the storages are <code>memoryStorage</code>, which means the data will not persist across pages. In a best-case scenario, each of the storage types are implemented using native <code>sessionStorage</code> and <code>localStorage</code>, with cookie support in <code>cookieStorage</code>.</p>
 
-<p>In a worst-case scenario, all of the storages are <code>memoryStorage</code>, which means the data will not persist across pages. In a best-case scenario, each of the storage types are implemented using native <code>sessionStorage</code> and <code>localStorage</code> with cookie support as well with <code>cookieStorage</code>.</p>
+    <h3>Examples</h3>
+        <h4>Using callback and a custom prefix (callback supports IE7 and lower):</h4>
 
-<h3>Examples</h3>
-
-<p>Using callback and a custom prefix (callback supports IE7 and lower):</p>
-
-<pre><code>initStorer(function (Storer) {
+            <pre class="prettyprint linenums">initStorer(function (Storer) {
     cookieStorage  = Storer.cookieStorage;
     memoryStorage  = Storer.memoryStorage;
     sessionStorage = Storer.sessionStorage;
     localStorage   = Storer.localStorage;
-}, { 'prefix': '_MyStorage_' });
-</code></pre>
+}, { 'prefix': '_MyStorage_' });</pre>
 
-<p>Using return (return does not support localStorage in IE7):</p>
+        <h4>Using return (return does not support localStorage in IE7):</h4>
 
-<pre><code>var Storer = initStorer();
-</code></pre>
+            <pre class="prettyprint linenums">var Storer = initStorer();</pre>
 
-<h3>Arguments for <code>initStorer</code>
-</h3>
+    <h3>Arguments for <code>initStorer</code></h3>
+        <pre class="prettyprint linenums">initStorer([Function callback[, Object params]]);</pre>
 
-<pre><code>initStorer([Function callback[, Object params]]);
-</code></pre>
+        <h4>Function <code>callback(Object Storer)</code></h4>
 
-<h4>Function <code>callback(Object Storer)</code>
-</h4>
+            <p>The callback function to call once the storage has been initialized. In most modern browsers, it is called <em>synchronously</em>. In older versions of IE that require the use of userData for localStorage, it is triggered <em>asynchronously</em> once the page has loaded. It returns an Object called <code>Storer</code>, which contains <code>cookieStorage</code>, <code>localStorage</code>, <code>memoryStorage</code>, and <code>sessionStorage</code>.</p>
 
-<p>The callback function to call once the storage has been initialized. In most modern browsers, it is called synchronously. In older versions of IE that require the use of userData for localStorage, it is triggered asynchronously once the page has loaded.</p>
+        <h4>Object <code>params</code></h4>
 
-<p>It returns an Object called Storer, which contains cookieStorage, localStorage, memoryStorage, and sessionStorage.</p>
+            <pre class="prettyprint linenums">
+{String} [prefix='']        // automatic key prefix for sessionStorage and localStorage
+{String} [default_domain='']// default domain for cookies
+{String} [default_path='']  // default path for cookies</pre>
 
-<h4>Object <code>params</code>
-</h4>
+    <h3>Important notice regarding dependencies</h3>
 
-<pre><code>{String} [prefix='']         automatic key prefix for sessionStorage and localStorage
-{String} [default_domain=''] default domain for cookies
-{String} [default_path='']   default path for cookies
-</code></pre>
+        <p>For Internet Explorer 7 and lower, initStorer requires a function called domReady, or uses jQuery(document).ready if available. If no function is found, localStorage will silently fail and is not usable in old IE browsers. <code>domReady</code> is included in the dependencies subdirectory of this repository. <em>(In a future revision, this functionality may fall back to cookieStorage when no such function is present.)</em></p>
 
-<h3>Important notice regarding dependencies</h3>
+<h2>Demo</h2>
+    <div class="form-horizontal" id="demos">
+        <h3>memoryStorage: non-persistent storage</h3>
+        <div class="control-group">
+            <input type="text" class="control-label input-mini" placeholder="Waiting for data..." readonly />
+            <div class="controls">
+                <pre class="lineless prettyprint">memoryStorage.setItem('foo', 'bar');</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', String)</button>
 
-<p>For Internet Explorer 7 and lower, initStorer requires a function called domReady, or uses jQuery(document).ready if available. If no function is found, localStorage will silently fail and is not usable in old IE browsers. <code>domReady</code> is included in the dependencies subdirectory of this repository. <em>(In a future revision, this functionality may fall back to cookieStorage when no such function is present.)</em></p>
+                <pre class="lineless prettyprint">memoryStorage.setItem('foo', [1,2,3]);</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', Array)</button>
 
-<h2>License</h2>
+                <pre class="lineless prettyprint">memoryStorage.setItem('foo', {moo: false});</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', Complex Object)</button>
 
-<p>Creative Commons Attribution 3.0 Unported (CC BY 3.0). <a href="http://creativecommons.org/licenses/by/3.0/">http://creativecommons.org/licenses/by/3.0/</a>
-It's free. All we ask is that you maintain the <a href="https://github.com/copyright" class="user-mention">@copyright</a> and <a href="https://github.com/author" class="user-mention">@author</a> comments in the code. Nothing else is necessary.</p>
+                <pre class="lineless prettyprint">memoryStorage.removeItem('foo');</pre>
+                <button class="btn btn-danger"><i class="icon-remove"></i> removeItem('foo')</button>
+
+                <pre class="lineless prettyprint">return memoryStorage.getItem('foo');</pre>
+                <button class="btn btn-success"><i class="icon-eye-open"></i> getItem('foo')</button>
+
+                <pre class="lineless prettyprint">return memoryStorage.hasItem('foo');</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> hasItem('foo')</button>
+            </div>
+
+            <input type="text" class="control-label input-mini" placeholder="Waiting for data..." readonly />
+            <div class="controls">
+                <pre class="lineless prettyprint">memoryStorage.setItem('foo2', 'hello');</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo2', String)</button>
+
+                <pre class="lineless prettyprint">return memoryStorage.length;</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> length</button>
+
+                <pre class="lineless prettyprint">return memoryStorage.key(0);</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> key(0)</button>
+
+                <pre class="lineless prettyprint">return memoryStorage.key(memoryStorage.length - 1);</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> key(length-1)</button>
+
+                <pre class="lineless prettyprint">return memoryStorage.getItem(memoryStorage.key(memoryStorage.length - 1));</pre>
+                <button class="btn btn-success"><i class="icon-eye-open"></i> getItem(key(length-1))</button>
+
+                <pre class="lineless prettyprint">memoryStorage.clear();</pre>
+                <button class="btn btn-danger"><i class="icon-remove"></i> clear()</button>
+            </div>
+        </div>
+
+        <h3>cookieStorage: semi-persistent storage</h3>
+        <div class="control-group">
+            <input type="text" class="control-label input-mini" placeholder="Waiting for data..." readonly />
+            <div class="controls">
+                <pre class="lineless prettyprint">cookieStorage.setItem('foo', 'bar');
+// Session only</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', String)</button>
+
+                <pre class="lineless prettyprint">cookieStorage.setItem('foo', 'short time', 600);
+// Number = max-age: 10 minute persistence</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', String, Number)</button>
+
+                <pre class="lineless prettyprint">cookieStorage.setItem('foo', 'long time', 'Tue, 04 Aug 2015 16:23:42 GMT');
+// String = expires: on Tue, 04 Aug 2015 16:23:42 GMT
+// (can also pass Date object)</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', String, 60)</button>
+
+                <pre class="lineless prettyprint">cookieStorage.setItem('foo', {moo: false});</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', Complex Object)</button>
+
+                <pre class="lineless prettyprint">cookieStorage.removeItem('foo');</pre>
+                <button class="btn btn-danger"><i class="icon-remove"></i> removeItem('foo')</button>
+
+                <pre class="lineless prettyprint">return cookieStorage.getItem('foo');</pre>
+                <button class="btn btn-success"><i class="icon-eye-open"></i> getItem('foo')</button>
+
+                <pre class="lineless prettyprint">return cookieStorage.hasItem('foo');</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> hasItem('foo')</button>
+
+                <pre class="lineless prettyprint">return cookieStorage.getAll(false, true);
+// get all cookies as array of objects</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> getAll(false, true)</button>
+
+                <pre class="lineless prettyprint">return cookieStorage.getAll(true, true);
+// get all cookies as key-value object</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> getAll(true, true)</button>
+
+                <pre class="lineless prettyprint">return cookieStorage.getAll(true);
+// get cookies for current prefix as key-value object</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> getAll(true)</button>
+            </div>
+        </div>
+
+        <h3>sessionStorage: session-persistent storage (tab+domain only)</h3>
+        <div class="control-group">
+            <input type="text" class="control-label input-mini" placeholder="Waiting for data..." readonly />
+            <div class="controls">
+                <pre class="lineless prettyprint">sessionStorage.setItem('foo', 'bar');</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', String)</button>
+
+                <pre class="lineless prettyprint">sessionStorage.setItem('foo', [1,2,3]);</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', Array)</button>
+
+                <pre class="lineless prettyprint">sessionStorage.setItem('foo', {moo: false});</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', Complex Object)</button>
+
+                <pre class="lineless prettyprint">sessionStorage.removeItem('foo');</pre>
+                <button class="btn btn-danger"><i class="icon-remove"></i> removeItem('foo')</button>
+
+                <pre class="lineless prettyprint">return sessionStorage.getItem('foo');</pre>
+                <button class="btn btn-success"><i class="icon-eye-open"></i> getItem('foo')</button>
+
+                <pre class="lineless prettyprint">return sessionStorage.hasItem('foo');</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> hasItem('foo')</button>
+            </div>
+
+            <input type="text" class="control-label input-mini" placeholder="Waiting for data..." readonly />
+            <div class="controls">
+                <pre class="lineless prettyprint">sessionStorage.setItem('foo2', 'hello');</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo2', String)</button>
+
+                <pre class="lineless prettyprint">return sessionStorage.length;</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> length</button>
+
+                <pre class="lineless prettyprint">return sessionStorage.key(0);</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> key(0)</button>
+
+                <pre class="lineless prettyprint">return sessionStorage.key(sessionStorage.length - 1);</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> key(length-1)</button>
+
+                <pre class="lineless prettyprint">return sessionStorage.getItem(sessionStorage.key(sessionStorage.length - 1));</pre>
+                <button class="btn btn-success"><i class="icon-eye-open"></i> getItem(key(length-1))</button>
+
+                <pre class="lineless prettyprint">sessionStorage.clear();</pre>
+                <button class="btn btn-danger"><i class="icon-remove"></i> clear()</button>
+            </div>
+        </div>
+
+        <h3>localStorage: fully-persistent storage (domain only)</h3>
+        <div class="control-group">
+            <input type="text" class="control-label input-mini" placeholder="Waiting for data..." readonly />
+            <div class="controls">
+                <pre class="lineless prettyprint">localStorage.setItem('foo', 'bar');</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', String)</button>
+
+                <pre class="lineless prettyprint">localStorage.setItem('foo', [1,2,3]);</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', Array)</button>
+
+                <pre class="lineless prettyprint">localStorage.setItem('foo', {moo: false});</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo', Complex Object)</button>
+
+                <pre class="lineless prettyprint">localStorage.removeItem('foo');</pre>
+                <button class="btn btn-danger"><i class="icon-remove"></i> removeItem('foo')</button>
+
+                <pre class="lineless prettyprint">return localStorage.getItem('foo');</pre>
+                <button class="btn btn-success"><i class="icon-eye-open"></i> getItem('foo')</button>
+
+                <pre class="lineless prettyprint">return localStorage.hasItem('foo');</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> hasItem('foo')</button>
+            </div>
+
+            <input type="text" class="control-label input-mini" placeholder="Waiting for data..." readonly />
+            <div class="controls">
+                <pre class="lineless prettyprint">localStorage.setItem('foo2', 'hello');</pre>
+                <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo2', String)</button>
+
+                <pre class="lineless prettyprint">return localStorage.length;</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> length</button>
+
+                <pre class="lineless prettyprint">return localStorage.key(0);</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> key(0)</button>
+
+                <pre class="lineless prettyprint">return localStorage.key(localStorage.length - 1);</pre>
+                <button class="btn btn-info"><i class="icon-eye-open"></i> key(length-1)</button>
+
+                <pre class="lineless prettyprint">return localStorage.getItem(localStorage.key(localStorage.length - 1));</pre>
+                <button class="btn btn-success"><i class="icon-eye-open"></i> getItem(key(length-1))</button>
+
+                <pre class="lineless prettyprint">localStorage.clear();</pre>
+                <button class="btn btn-danger"><i class="icon-remove"></i> clear()</button>
+            </div>
+        </div>
+    </div>
 
 <h2>Addendum</h2>
 
-<p>Here is a cat. =^.^= His name is Frisbee.</p>
+    <p>Here is a cat. =^.^= His name is Frisbee.</p>
 
-<p>-- Copyright (c) 2011 Viafoura, Inc.</p>
-        </article>
-      </div>
+    <p>-- Copyright (c) 2011 Viafoura, Inc.</p>
+                </article>
+            </div>
+        </div>
+        <footer>
+            <div class="owner">
+                <p><a href="https://github.com/shahyar" class="avatar"><img
+                        src="https://secure.gravatar.com/avatar/d71c3066c92404dd59802fa68294f962?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png"
+                        width="48" height="48"/></a> <a href="https://github.com/shahyar">shahyar</a> maintains <a
+                        href="https://github.com/viafoura/Storer.js">Storer.js</a></p>
+            </div>
+            <div class="creds">
+                <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a
+                        href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
+            </div>
+        </footer>
     </div>
-    <footer>
-      <div class="owner">
-      <p><a href="https://github.com/shahyar" class="avatar"><img src="https://secure.gravatar.com/avatar/d71c3066c92404dd59802fa68294f962?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" width="48" height="48"/></a> <a href="https://github.com/shahyar">shahyar</a> maintains <a href="https://github.com/viafoura/Storer.js">Storer.js</a></p>
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
-    </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/viafoura/Storer.js/tarball/master" class="tar">tar</a><a href="https://github.com/viafoura/Storer.js/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
+    <div class="current-section">
+        <a href="#top">Scroll to top</a>
+        <a href="https://github.com/viafoura/Storer.js/tarball/master" class="tar">tar</a><a
+            href="https://github.com/viafoura/Storer.js/zipball/master" class="zip">zip</a><a href="" class="code">source
+        code</a>
 
-  
+        <p class="name"></p>
+    </div>
 </body>
 </html>

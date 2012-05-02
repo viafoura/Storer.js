@@ -1,21 +1,4 @@
-/* http://meyerweb.com/eric/tools/css/reset/
-   v2.0 | 20110126
-   License: none (public domain)
-*/
-
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+h1, h2, h3, h4, h5, h6, p {
   margin: 0;
   padding: 0;
   border: 0;
@@ -23,28 +6,51 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
-  display: block;
+code {
+    font-size: 80%;
+    line-height: inherit;
 }
-body {
-  line-height: 1;
+
+/* Prettyprint */
+.com { color: #e3f5f5; }
+.lit { color: #27abfd; }
+.pun, .opn, .clo { color: #c9e0e0; }
+.fun { color: #ff3733; }
+.str, .atv { color: #82c432; }
+.kwd, .linenums .tag { color: #3968ff; }
+.typ, .atn, .dec, .var { color: #00f0f0; }
+.pln { color: #80bde9; }
+
+.markdown-body .controls,
+.markdown-body .control-label{
+    margin-top: 8px;
 }
-ol, ul {
-  list-style: none;
+.markdown-body .controls pre.prettyprint {
+    margin-top: 4px;
+    margin-bottom: 2px;
 }
-blockquote, q {
-  quotes: none;
+.markdown-body .prettyprint {
+  padding: 8px;
+  background-color: #3B3B3B;
+  border: 1px solid #ddd;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
-  content: '';
-  content: none;
+.markdown-body .prettyprint.linenums {
+  -webkit-box-shadow: inset 40px 0 0 #2A2A2A, inset 41px 0 0 #444;
+     -moz-box-shadow: inset 40px 0 0 #2A2A2A, inset 41px 0 0 #444;
+          box-shadow: inset 40px 0 0 #2A2A2A, inset 41px 0 0 #444;
 }
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+
+/* Specify class=linenums on a pre to get line numbering */
+.markdown-body ol.linenums {
+  padding: 0;
+  margin: 0 0 0 33px; /* IE indents via margin-left */
+}
+.markdown-body ol.linenums li {
+  margin-bottom: 0;
+  padding: 0 0 0 12px;
+  color: #d6d6d6;
+  line-height: 18px;
+  text-shadow: 0 1px 0 #000;
 }
 
 /* Style */
@@ -387,31 +393,6 @@ footer .owner p a {
 
 .markdown-body h5 {
   font-size: 16px;
-}
-
-.markdown-body pre {
-  padding: 10px 70px 10px 0;
-  margin-left: -20px;
-  margin-right: -20px;
-  font-family: 'Monaco', 'Lucida Console', monospace;
-  font-size: 13px;
-  line-height: 20px;
-  box-shadow: inset 0 0 5px #000;
-  word-wrap: break-word;
-  background-color:#3b3b3b;
-  color: #d6d6d6;
-}
-
-.markdown-body pre.lines {
-  font-size: 12px;
-  margin:0 10px 0 -20px;
-  padding: 10px;
-  float:  left;
-  display: block;
-  text-align: right;
-  box-shadow: none;
-  background-color:#2a2a2a;
-  color: #d6d6d6;
 }
 
 .markdown-body ul,
