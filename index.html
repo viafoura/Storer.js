@@ -218,7 +218,8 @@ memoryStorage  = memoryStorage; // non-persistent</pre>
                 <pre class="lineless prettyprint">sessionStorage.setItem('foo2', 'hello');</pre>
                 <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo2', String)</button>
 
-                <pre class="lineless prettyprint">return sessionStorage.length;</pre>
+                <pre class="lineless prettyprint">return sessionStorage.length;
+// Known issue: length includes items that don't match the given prefix</pre>
                 <button class="btn btn-info"><i class="icon-eye-open"></i> length</button>
 
                 <pre class="lineless prettyprint">return sessionStorage.key(0);</pre>
@@ -263,7 +264,8 @@ memoryStorage  = memoryStorage; // non-persistent</pre>
                 <pre class="lineless prettyprint">localStorage.setItem('foo2', 'hello');</pre>
                 <button class="btn btn-primary"><i class="icon-pencil"></i> setItem('foo2', String)</button>
 
-                <pre class="lineless prettyprint">return localStorage.length;</pre>
+                <pre class="lineless prettyprint">return localStorage.length;
+// Known issue: length includes items that don't match the given prefix</pre>
                 <button class="btn btn-info"><i class="icon-eye-open"></i> length</button>
 
                 <pre class="lineless prettyprint">return localStorage.key(0);</pre>
