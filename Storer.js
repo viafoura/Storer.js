@@ -696,11 +696,20 @@ function initStorer(callback, params) {
                 };
                 _tmp.prototype = _sessionStorage;
                 _tmp = new _tmp();
+                try {
+                    if (_tmp.getItem) {
+                        _tmp.setItem(_TESTID, 2);
+                        _tmp.removeItem(_TESTID);
+                    }
+                } catch (e) {
+                    // Firefox 14+ throws a security exception when wrapping a native class
+                    _tmp = null;
+                }
 
-                if (!_tmp.getItem) {
+                if (_tmp && !_tmp.getItem) {
                     // Internet Explorer 8 does not inherit the prototype here. We can hack around it using a DOM object
                     _sessionStorage = _createDOMStorage('sessionstorage', _sessionStorage);
-                } else if (Object.prototype.toString.apply(Storage.prototype) === '[object StoragePrototype]') {
+                } else if (!_tmp || Object.prototype.toString.apply(Storage.prototype) === '[object StoragePrototype]') {
                     // Safari throws a type error when extending with Storage
                     _sessionStorage = _createReferencedStorage('sessionstorage', _sessionStorage);
                 } else {
@@ -783,11 +792,20 @@ function initStorer(callback, params) {
                 var _tmp = function () {};
                 _tmp.prototype = _localStorage;
                 _tmp = new _tmp();
+                try {
+                    if (_tmp.getItem) {
+                        _tmp.setItem(_TESTID, 2);
+                        _tmp.removeItem(_TESTID);
+                    }
+                } catch (e) {
+                    // Firefox 14+ throws a security exception when wrapping a native class
+                    _tmp = null;
+                }
 
-                if (!_tmp.getItem) {
+                if (_tmp && !_tmp.getItem) {
                     // Internet Explorer 8 does not inherit the prototype here. We can hack around it using a DOM object
                     _localStorage = _createDOMStorage('localstorage', _localStorage);
-                } else if (Object.prototype.toString.apply(Storage.prototype) === '[object StoragePrototype]') {
+                } else if (!_tmp || Object.prototype.toString.apply(Storage.prototype) === '[object StoragePrototype]') {
                     // Safari throws a type error when extending with Storage
                     _localStorage = _createReferencedStorage('localstorage', _localStorage);
                 } else {
