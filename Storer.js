@@ -680,7 +680,7 @@ function initStorer(callback, params) {
     /**
      * @namespace sessionStorage
      */
-    _returnable.sessionStorage = sessionStorage = function () {
+    _returnable.sessionStorage = sessionStorage = (function () {
         // Grab sessionStorage from top window
         var _sessionStorage = top.sessionStorage;
 
@@ -774,7 +774,7 @@ function initStorer(callback, params) {
             }
         };
         return _sessionStorage;
-    }();
+    }());
 
     /**
      * @namespace localStorage
