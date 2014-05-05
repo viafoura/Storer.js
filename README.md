@@ -1,4 +1,4 @@
-# Storer.js - HTML5 Web Storage for Any Browser
+# Storer.js - HTML5 Web Storage for Any Browser [![Build Status](https://travis-ci.org/shahyar/Storer.js.svg?branch=master)](https://travis-ci.org/shahyar/Storer.js)
 Originally written for [Viafoura](http://viafoura.com/ "Viafoura is an audience engagement platform for publishers") by Shahyar G, released for public consumption by Viafoura, Inc.
 
 ## Introduction
