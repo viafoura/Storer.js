@@ -344,6 +344,7 @@ function initStorer(callback, params) {
         return _memoryStorage;
     }
 
+    //@ifndef IELESS
     /**
      * Returns a nameStorage object. This constructor is designed to be a fallback for sessionStorage in IE7 and under.
      * It uses window.name and RC4 encryption on a per-domain basis. Inspired by LSS by Andrea Giammarchi.
@@ -656,6 +657,7 @@ function initStorer(callback, params) {
 
         return _nameStorage;
     }
+    //@endif
 
     // Return this stuff
     var _returnable = {
@@ -722,6 +724,7 @@ function initStorer(callback, params) {
 
         // Build one
         if (!_sessionStorage) {
+            //@ifndef IELESS
             try {
                 // instantiate nameStorage
                 _sessionStorage = _createNameStorage();
@@ -736,6 +739,7 @@ function initStorer(callback, params) {
             } catch (e) {
                 _sessionStorage = null;
             }
+            //@endif
 
             // Last ditch effort: use memory storage
             if (!_sessionStorage) {
@@ -818,6 +822,7 @@ function initStorer(callback, params) {
         }
 
         // Did not work, try userData, cookie, or memory:
+        //@ifndef IELESS
         if (!_localStorage) {
             _localStorage = (function () {
                 /**
@@ -978,6 +983,7 @@ function initStorer(callback, params) {
                 }
             }());
         }
+        //@endif
 
         if (!_localStorage) {
             _localStorage = _createCookieStorage();

@@ -1,6 +1,6 @@
 {
   "name": "Storer.js",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Storer.js",
   "main": "Gruntfile.js",
   "directories": {
@@ -21,7 +21,9 @@
   "license": "CC-BY 3.0",
   "dependencies": {
     "grunt": "~0.4.4",
-    "grunt-contrib-qunit": "~0.4.0"
+    "grunt-contrib-qunit": "~0.4.0",
+    "grunt-preprocess": "~4.0.0",
+    "grunt-contrib-uglify": "~0.3.3"
   },
   "devDependencies": {}
 }

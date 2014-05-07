@@ -1,8 +1,8 @@
 /** Storer.js (IEless)
- * @copyright Viafoura, Inc. <viafoura.com>
- * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>
- * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.
- */
+* @copyright Viafoura, Inc. <viafoura.com>
+* @author Shahyar G <github.com/shahyar> for <github.com/viafoura>
+* @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.
+*/
 
 /**
  * This will return an object with each of the storage types.
@@ -362,9 +362,12 @@ function initStorer(callback, params) {
             }
         }
 
-        // Last ditch effort: use memory storage
+        // Build one
         if (!_sessionStorage) {
-            _sessionStorage = _createMemoryStorage();
+            // Last ditch effort: use memory storage
+            if (!_sessionStorage) {
+                _sessionStorage = _createMemoryStorage();
+            }
         }
 
         // Rewire functions to use a prefix and avoid collisions
@@ -441,7 +444,7 @@ function initStorer(callback, params) {
             }
         }
 
-        // Did not work, try cookie, or memory:
+        // Did not work, try userData, cookie, or memory:
         if (!_localStorage) {
             _localStorage = _createCookieStorage();
         }
