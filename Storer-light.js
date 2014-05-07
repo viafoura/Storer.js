@@ -1,4 +1,6 @@
-/** Storer.js (IEless)
+/** Storer.js (Light)
+* This lightweight version of Storer removes support for userData and window.name storage.
+* It is incompatible with versions of Internet Explorer prior to IE8.
 * @copyright Viafoura, Inc. <viafoura.com>
 * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>
 * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.
@@ -6,8 +8,7 @@
 
 /**
  * This will return an object with each of the storage types.
- * The callback will fire when all of the necessary types have been created, although it's really only necessary
- * for Internet Explorer's userData storage, which requires domReady to begin.
+ * The callback will fire when all of the necessary types have been created.
  *
  * @author Shahyar G <github.com/shahyar> of Viafoura, Inc. <viafoura.com>
  * @param {Function} [callback]
