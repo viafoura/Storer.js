@@ -6,13 +6,13 @@ module.exports = function(grunt) {
         preprocess: {
             options: {
                 context: {
-                    IELESS: true
+                    LIGHT: true
                 }
             },
 
             js: {
                 src: 'Storer.js',
-                dest: 'Storer-ieless.js'
+                dest: 'Storer-light.js'
             }
         },
 
@@ -20,7 +20,7 @@ module.exports = function(grunt) {
             all: {
                 files: {
                     'Storer.min.js': 'Storer.js',
-                    'Storer-ieless.min.js': 'Storer-ieless.js'
+                    'Storer-light.min.js': 'Storer-light.js'
                 }
             }
         },
@@ -37,13 +37,13 @@ module.exports = function(grunt) {
 
     // Wrap task
     grunt.registerTask('wrap', function () {
-        ['Storer.min.js', 'Storer-ieless.js', 'Storer-ieless.min.js'].forEach(function (filename) {
+        ['Storer.min.js', 'Storer-light.js', 'Storer-light.min.js'].forEach(function (filename) {
             var src = grunt.file.read(filename);
 
             // Inject header text
             grunt.file.write(
                 filename,
-                "/** Storer.js" + (filename.match('ieless') ? " (IEless)" : "") + "\n" +
+                "/** Storer.js" + (filename.match('light') ? " (light)" : "") + "\n" +
                     "* @copyright Viafoura, Inc. <viafoura.com>\n" +
                     "* @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n" +
                     "* @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n" +
