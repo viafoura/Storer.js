@@ -1,4 +1,4 @@
-/** Storer.js (Light)
+/** Storer.js (light)
 * This lightweight version of Storer removes support for userData and window.name storage.
 * It is incompatible with versions of Internet Explorer prior to IE8.
 * @copyright Viafoura, Inc. <viafoura.com>
@@ -18,7 +18,7 @@
  *                 {String} [default_path='']   default path for cookies
  * @return {Object} cookieStorage, localStorage, memoryStorage, sessionStorage
  */
-function initStorer(callback, params) {
+window.initStorer = function (callback, params) {
     var _TESTID      = '__SG__',
         top          = window,
         PREFIX       = (params = params || {}).prefix || '',

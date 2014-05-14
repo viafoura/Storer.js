@@ -62,7 +62,7 @@
  *                 {String} [default_path='']   default path for cookies
  * @return {Object} cookieStorage, localStorage, memoryStorage, sessionStorage
  */
-function initStorer(callback, params) {
+window.initStorer = function (callback, params) {
     var _TESTID      = '__SG__',
         top          = window,
         PREFIX       = (params = params || {}).prefix || '',
