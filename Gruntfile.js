@@ -45,23 +45,23 @@ module.exports = function(grunt) {
                 grunt.file.write(
                     filename,
                     "/** Storer.js (light)\n" +
-                        "* This lightweight version of Storer removes support for userData and window.name storage.\n" +
-                        "* It is incompatible with versions of Internet Explorer prior to IE8.\n" +
-                        "* @copyright Viafoura, Inc. <viafoura.com>\n" +
-                        "* @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n" +
-                        "* @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n" +
-                        "*/" +
-                        src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
+                        + " * This lightweight version of Storer removes support for userData and window.name storage.\n"
+                        + " * It is incompatible with versions of Internet Explorer prior to IE8.\n"
+                        + " * @copyright Viafoura, Inc. <viafoura.com>\n"
+                        + " * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n"
+                        + " * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n"
+                        + " */"
+                        + src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
                 );
             } else {
                 grunt.file.write(
                     filename,
-                    "/** Storer.js\n" +
-                        "* @copyright Viafoura, Inc. <viafoura.com>\n" +
-                        "* @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n" +
-                        "* @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n" +
-                        "*/" +
-                        src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
+                    "/** Storer.js\n"
+                        + " * @copyright Viafoura, Inc. <viafoura.com>\n"
+                        + " * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n"
+                        + " * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n"
+                        + " */"
+                        + src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
                 );
             }
 
