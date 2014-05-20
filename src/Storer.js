@@ -126,10 +126,10 @@ window.initStorer = function (callback, params) {
      */
     function _createCookieStorage(cookie_prefix) {
         cookie_prefix        = (cookie_prefix || '') + PREFIX;
-        var _cookiergx       = new RegExp("(?:^|;)\s*" + cookie_prefix + "[^=]+\s*\=[^;]*", "g"),
-            _nameclean       = new RegExp("^;?\s*" + cookie_prefix),
-            _cookiergxGlobal = new RegExp("(?:^|;)\s*[^=]+\s*\=[^;]*", "g"),
-            _namecleanGlobal = new RegExp("^;?\s*"),
+        var _cookiergx       = new RegExp("(?:^|;)\\s*" + cookie_prefix + "[^=]+\\s*=[^;]*", "g"),
+            _nameclean       = new RegExp("^;?\\s*" + cookie_prefix),
+            _cookiergxGlobal = new RegExp("(?:^|;)\\s*[^=]+\\s*=[^;]*", "g"),
+            _namecleanGlobal = new RegExp("^;?\\s*"),
             _expire          = (new Date(1979)).toGMTString(),
             _cookieStorage   = {
             STORE_TYPE: 'cookieStorage',
@@ -344,7 +344,7 @@ window.initStorer = function (callback, params) {
         return _memoryStorage;
     }
 
-    //@ifndef IELESS
+    //@ifndef LIGHT
     /**
      * Returns a nameStorage object. This constructor is designed to be a fallback for sessionStorage in IE7 and under.
      * It uses window.name and RC4 encryption on a per-domain basis. Inspired by LSS by Andrea Giammarchi.
@@ -724,7 +724,7 @@ window.initStorer = function (callback, params) {
 
         // Build one
         if (!_sessionStorage) {
-            //@ifndef IELESS
+            //@ifndef LIGHT
             try {
                 // instantiate nameStorage
                 _sessionStorage = _createNameStorage();
@@ -822,7 +822,7 @@ window.initStorer = function (callback, params) {
         }
 
         // Did not work, try userData, cookie, or memory:
-        //@ifndef IELESS
+        //@ifndef LIGHT
         if (!_localStorage) {
             _localStorage = (function () {
                 /**
@@ -1031,4 +1031,4 @@ window.initStorer = function (callback, params) {
     _callbackNow && callback && callback(_returnable);
 
     return _returnable;
-}
+};

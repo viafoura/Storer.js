@@ -1,14 +1,13 @@
 /** Storer.js (light)
-* This lightweight version of Storer removes support for userData and window.name storage.
-* It is incompatible with versions of Internet Explorer prior to IE8.
-* @copyright Viafoura, Inc. <viafoura.com>
-* @author Shahyar G <github.com/shahyar> for <github.com/viafoura>
-* @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.
-*/
+NaN * @copyright Viafoura, Inc. <viafoura.com>
+ * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>
+ * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.
+ */
 
 /**
  * This will return an object with each of the storage types.
- * The callback will fire when all of the necessary types have been created.
+ * The callback will fire when all of the necessary types have been created, although it's really only necessary
+ * for Internet Explorer's userData storage, which requires domReady to begin.
  *
  * @author Shahyar G <github.com/shahyar> of Viafoura, Inc. <viafoura.com>
  * @param {Function} [callback]
@@ -82,10 +81,10 @@ window.initStorer = function (callback, params) {
      */
     function _createCookieStorage(cookie_prefix) {
         cookie_prefix        = (cookie_prefix || '') + PREFIX;
-        var _cookiergx       = new RegExp("(?:^|;)\s*" + cookie_prefix + "[^=]+\s*\=[^;]*", "g"),
-            _nameclean       = new RegExp("^;?\s*" + cookie_prefix),
-            _cookiergxGlobal = new RegExp("(?:^|;)\s*[^=]+\s*\=[^;]*", "g"),
-            _namecleanGlobal = new RegExp("^;?\s*"),
+        var _cookiergx       = new RegExp("(?:^|;)\\s*" + cookie_prefix + "[^=]+\\s*=[^;]*", "g"),
+            _nameclean       = new RegExp("^;?\\s*" + cookie_prefix),
+            _cookiergxGlobal = new RegExp("(?:^|;)\\s*[^=]+\\s*=[^;]*", "g"),
+            _namecleanGlobal = new RegExp("^;?\\s*"),
             _expire          = (new Date(1979)).toGMTString(),
             _cookieStorage   = {
             STORE_TYPE: 'cookieStorage',
@@ -492,4 +491,4 @@ window.initStorer = function (callback, params) {
     _callbackNow && callback && callback(_returnable);
 
     return _returnable;
-}
+};

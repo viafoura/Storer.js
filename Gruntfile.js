@@ -1,32 +1,47 @@
 module.exports = function(grunt) {
+    var SRCPATH      = 'src/Storer.js';
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
         preprocess: {
-            options: {
-                context: {
-                    LIGHT: true
-                }
+            base: {
+                src: SRCPATH,
+                dest: 'release/Storer.js'
             },
 
-            js: {
-                src: 'Storer.js',
-                dest: 'Storer-light.js'
+            light: {
+                src: SRCPATH,
+                dest: 'release/Storer-light.js',
+                options: {
+                    context: {
+                        LIGHT: true
+                    }
+                }
             }
         },
 
         uglify: {
             all: {
                 files: {
-                    'Storer.min.js': 'Storer.js',
-                    'Storer-light.min.js': 'Storer-light.js'
+                    'release/Storer.min.js': 'release/Storer.js',
+                    'release/Storer-light.min.js': 'release/Storer-light.js'
                 }
             }
         },
 
         qunit: {
             all: ['tests/qunit.html']
+        },
+
+        jshint: {
+            base: {
+                options: {
+                    jshintrc: '.jshintrc'
+                },
+                src: [SRCPATH]
+            }
         }
     });
 
@@ -34,36 +49,32 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-preprocess');
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
     // Wrap task
     grunt.registerTask('wrap', function () {
-        ['Storer.min.js', 'Storer-light.js', 'Storer-light.min.js'].forEach(function (filename) {
-            var src = grunt.file.read(filename);
+        ['release/Storer-light.js', 'release/Storer.min.js', 'release/Storer-light.min.js'].forEach(function (filename) {
+            var src = grunt.file.read(filename),
+                output;
+
+            // Change top of header for light version
+            if (filename.match('light')) {
+                output = "/** Storer.js (light)\n" +
+                    + " * This light version removes userData and window.name storage. It is incompatible Internet Explorer prior to IE8.\n"
+            } else {
+                output = "/** Storer.js\n";
+            }
 
             // Inject header text
-            if (filename.match('light')) {
-                grunt.file.write(
-                    filename,
-                    "/** Storer.js (light)\n" +
-                        + " * This lightweight version of Storer removes support for userData and window.name storage.\n"
-                        + " * It is incompatible with versions of Internet Explorer prior to IE8.\n"
-                        + " * @copyright Viafoura, Inc. <viafoura.com>\n"
-                        + " * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n"
-                        + " * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n"
-                        + " */"
-                        + src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
-                );
-            } else {
-                grunt.file.write(
-                    filename,
-                    "/** Storer.js\n"
-                        + " * @copyright Viafoura, Inc. <viafoura.com>\n"
-                        + " * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n"
-                        + " * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n"
-                        + " */"
-                        + src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
-                );
-            }
+            grunt.file.write(
+                filename,
+                output
+                    + " * @copyright Viafoura, Inc. <viafoura.com>\n"
+                    + " * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n"
+                    + " * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n"
+                    + " */"
+                    + src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
+            );
 
             console.log('Wrapped ' + filename);
         });
@@ -74,6 +85,9 @@ module.exports = function(grunt) {
         grunt.task.run(['preprocess', 'uglify', 'wrap']);
     });
 
+    // Run tests
+    grunt.registerTask('test', ['jshint', 'qunit']);
+
     // Default task builds and runs tests
-    grunt.registerTask('default', ['build', 'qunit']);
+    grunt.registerTask('default', ['build', 'test']);
 };
