@@ -1,29 +1,30 @@
 {
-  "name": "Storer.js",
-  "version": "0.0.4",
-  "description": "Storer.js",
-  "main": "Gruntfile.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/shahyar/Storer.js.git"
-  },
-  "keywords": [
-    "web",
-    "storage"
-  ],
-  "author": "shahyar",
-  "license": "CC-BY 3.0",
-  "dependencies": {
-    "grunt": "~0.4.4",
-    "grunt-contrib-qunit": "~0.4.0",
-    "grunt-preprocess": "~4.0.0",
-    "grunt-contrib-uglify": "~0.3.3"
-  },
-  "devDependencies": {}
+    "name": "Storer.js",
+    "version": "0.0.4",
+    "description": "Storer.js",
+    "main": "Gruntfile.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/shahyar/Storer.js.git"
+    },
+    "keywords": [
+        "web",
+        "storage"
+    ],
+    "author": "shahyar",
+    "license": "CC-BY 3.0",
+    "dependencies": {
+        "grunt": "~0.4.5",
+        "grunt-contrib-qunit": "~0.4.0",
+        "grunt-preprocess": "~4.0.0",
+        "grunt-contrib-uglify": "~0.4.0",
+        "grunt-contrib-jshint": "~0.4.0"
+    },
+    "devDependencies": {}
 }
