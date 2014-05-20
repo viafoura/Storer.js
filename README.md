@@ -28,7 +28,7 @@ cookieStorage also supports an additional 'global' Boolean argument on all of it
 In a worst-case scenario, all of the storages are `memoryStorage`, which means the data will not persist across pages. In a best-case scenario, each of the storage types are implemented using native `sessionStorage` and `localStorage` with cookie support as well with `cookieStorage`.
 
 ### Light Version (IE8+ only)
-`Storer-light.min.js` has userData and window.name support removed, reducing the minified filesize by approximately 40%. If you do not need IE6 or IE7 support, this version will enable you to still retain the other fallbacks (cookie and memory).
+`Storer-light.min.js` has userData and window.name support removed, reducing the minified filesize by approximately 40%. If you do not need IE6 or IE7 support, this version will enable you to still retain the other fallbacks (cookie and memory). This version does not require using the callback function (see example below "using return").
 
 ### Examples
 Using callback and a custom prefix (callback supports IE7 and lower):
@@ -64,9 +64,10 @@ It returns an Object called Storer, which contains cookieStorage, localStorage, 
 
 ```javascript
 {
-    prefix:         String='' // automatic key prefix for sessionStorage and localStorage
-    default_domain: String='' // default domain for cookies
-    default_path:   String='' // default path for cookies
+    prefix:             String='' // automatic key prefix for sessionStorage and localStorage
+    default_domain:     String='' // default domain for cookies
+    default_path:       String='' // default path for cookies
+    no_cookie_fallback: Boolean=false // set to true to disable cookieStorage fallback for localStorage
 ```
 
 ### Important notice regarding dependencies

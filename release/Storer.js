@@ -26,14 +26,13 @@
  * insert an element into the document before proceeding. On any modern or non-IE browser, the callback function is
  * triggered synchronously and immediately.<br/>
  * <br/>
- * Note: initStorer requires a function called domReady, or uses jQuery(document).ready if available.<br/>
+ * Note: for IE6-7 compatibility, initStorer requires a function called domReady, or uses jQuery(document).ready if available.<br/>
  * <br/>
  * Here is a cat. =^.^= His name is Frisbee.
  * <br/>
  *
  * @todo cookieStorage is the sole storage subsystem which does not implement "length" and "key".
  * @todo It would be nice to have expiry times on all non-cookieStorage storage subsystems.
- * @todo Allow disabling userData for localStorage, so that the system is completely synchronous in all browsers.
  * @todo Implement automatic JSON stringify/parse if necessary.
  *
  * @copyright Viafoura, Inc. <viafoura.com>
@@ -57,17 +56,24 @@
  * @author Shahyar G <github.com/shahyar> of Viafoura, Inc. <viafoura.com>
  * @param {Function} [callback]
  * @param {Object} [params]
- *                 {String} [prefix='']         automatic key prefix for sessionStorage and localStorage
- *                 {String} [default_domain=''] default domain for cookies
- *                 {String} [default_path='']   default path for cookies
+ *                 {String}  [prefix='']                 automatic key prefix for sessionStorage and localStorage
+ *                 {String}  [default_domain='']         default domain for cookies
+ *                 {String}  [default_path='']           default path for cookies
+ *                 {Boolean} [no_cookie_fallback=false]  If true, do not use cookies as fallback for localStorage
  * @return {Object} cookieStorage, localStorage, memoryStorage, sessionStorage
  */
 window.initStorer = function (callback, params) {
-    var _TESTID      = '__SG__',
-        top          = window,
-        PREFIX       = (params = params || {}).prefix || '',
-        _callbackNow = true,
+    var _TESTID            = '__SG__',
+        top                = window,
+        PREFIX             = (params = Object.prototype.toString.call(callback) === "[object Object]" ? callback : (params || {})).prefix || '',
+        NO_COOKIE_FALLBACK = params.no_cookie_fallback || false,
+        _callbackNow       = true,
         cookieStorage, localStorage, memoryStorage, sessionStorage;
+
+    // Allow passing params without callback
+    if (params === callback) {
+        callback = null;
+    }
 
     // get top within cross-domain limit if we're in an iframe
     try { while (top !== top.top) { top = top.top; } } catch (e) {}
@@ -966,7 +972,7 @@ window.initStorer = function (callback, params) {
                             }
 
                             if (!userData) {
-                                _returnable.localStorage = localStorage = _localStorage = _createCookieStorage();
+                                _returnable.localStorage = localStorage = _localStorage = NO_COOKIE_FALLBACK ? _createMemoryStorage() : _createCookieStorage();
                                 callback && callback(_returnable);
                             }
                         });
@@ -977,7 +983,7 @@ window.initStorer = function (callback, params) {
             }());
         }
         if (!_localStorage) {
-            _localStorage = _createCookieStorage();
+            _localStorage = NO_COOKIE_FALLBACK ? _createMemoryStorage() : _createCookieStorage();
         }
 
         // Use the object natively without a prefix

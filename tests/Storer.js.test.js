@@ -8,9 +8,18 @@
 
             test('Initialization', function () {
                 var Storer, _success;
-                expect(5);
+                expect(6);
 
                 stop(2);
+
+                ok(
+                    Storer = initStorer(
+                        {
+                            prefix: i ? '' : '__StorerTestPrefix__'
+                        }
+                    ),
+                    'initStorer (without callback) should always return an object'
+                );
 
                 ok(
                     Storer = initStorer(

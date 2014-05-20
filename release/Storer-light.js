@@ -12,17 +12,24 @@ NaN * @copyright Viafoura, Inc. <viafoura.com>
  * @author Shahyar G <github.com/shahyar> of Viafoura, Inc. <viafoura.com>
  * @param {Function} [callback]
  * @param {Object} [params]
- *                 {String} [prefix='']         automatic key prefix for sessionStorage and localStorage
- *                 {String} [default_domain=''] default domain for cookies
- *                 {String} [default_path='']   default path for cookies
+ *                 {String}  [prefix='']                 automatic key prefix for sessionStorage and localStorage
+ *                 {String}  [default_domain='']         default domain for cookies
+ *                 {String}  [default_path='']           default path for cookies
+ *                 {Boolean} [no_cookie_fallback=false]  If true, do not use cookies as fallback for localStorage
  * @return {Object} cookieStorage, localStorage, memoryStorage, sessionStorage
  */
 window.initStorer = function (callback, params) {
-    var _TESTID      = '__SG__',
-        top          = window,
-        PREFIX       = (params = params || {}).prefix || '',
-        _callbackNow = true,
+    var _TESTID            = '__SG__',
+        top                = window,
+        PREFIX             = (params = Object.prototype.toString.call(callback) === "[object Object]" ? callback : (params || {})).prefix || '',
+        NO_COOKIE_FALLBACK = params.no_cookie_fallback || false,
+        _callbackNow       = true,
         cookieStorage, localStorage, memoryStorage, sessionStorage;
+
+    // Allow passing params without callback
+    if (params === callback) {
+        callback = null;
+    }
 
     // get top within cross-domain limit if we're in an iframe
     try { while (top !== top.top) { top = top.top; } } catch (e) {}
@@ -446,7 +453,7 @@ window.initStorer = function (callback, params) {
 
         // Did not work, try userData, cookie, or memory:
         if (!_localStorage) {
-            _localStorage = _createCookieStorage();
+            _localStorage = NO_COOKIE_FALLBACK ? _createMemoryStorage() : _createCookieStorage();
         }
 
         // Use the object natively without a prefix
