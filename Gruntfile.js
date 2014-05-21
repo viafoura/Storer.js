@@ -42,6 +42,16 @@ module.exports = function(grunt) {
                 },
                 src: [SRCPATH]
             }
+        },
+
+        jsdoc: {
+            dist: {
+                src: [SRCPATH],
+                options: {
+                    destination: 'docs',
+                    "private": false
+                }
+            }
         }
     });
 
@@ -50,6 +60,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
     // Wrap task
     grunt.registerTask('wrap', function () {
@@ -59,10 +70,10 @@ module.exports = function(grunt) {
 
             // Change top of header for light version
             if (filename.match('light')) {
-                output = "/** Storer.js (light)\n" +
+                output = "/*! Storer.js (light)\n"
                     + " * This light version removes userData and window.name storage. It is incompatible Internet Explorer prior to IE8.\n"
             } else {
-                output = "/** Storer.js\n";
+                output = "/*! Storer.js\n";
             }
 
             // Inject header text
@@ -82,7 +93,7 @@ module.exports = function(grunt) {
 
     // Build task in order
     grunt.registerTask('build', function () {
-        grunt.task.run(['preprocess', 'uglify', 'wrap']);
+        grunt.task.run(['preprocess', 'uglify', 'wrap', 'jsdoc']);
     });
 
     // Run tests
