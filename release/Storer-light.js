@@ -102,8 +102,30 @@ window.initStorer = function (callback, params) {
              * @const String */
             DEFAULT_PATH: escape(params.default_path || ''),
 
-            // @todo property {int} length
-            // @todo method {Function} key
+            length: 0,
+
+            /**
+             * Returns the cookie key at idx.
+             * @param {int} idx
+             * @param {Boolean} [global=false] Omits prefix.
+             * @return {mixed}
+             */
+            key: function (idx, global) {
+                var cookies = this.getAll(false, global);
+                return cookies[0] ? cookies[0].key : undefined;
+            },
+
+            /**
+             * Clears all cookies for this prefix.
+             * @param {Boolean} [global=false] Omits prefix.
+             */
+            clear: function (global) {
+                var cookies = this.getAll(false, global),
+                    i = cookies.length;
+                while (i--) {
+                    this.removeItem(cookies[i].key);
+                }
+            },
 
             /**
              * Returns an Array of Objects of key-value pairs, or an Object with properties-values plus length.
@@ -125,6 +147,7 @@ window.initStorer = function (callback, params) {
                         _cache.push({ key: unescape((matches[i] = matches[i].split('='))[0].replace(cleaner, '')), value: matches[i][1] });
                     }
                 }
+
                 return _cache;
             },
 
@@ -138,6 +161,7 @@ window.initStorer = function (callback, params) {
                 if (!key || !this.hasItem(key, global)) {
                     return null;
                 }
+
                 return ((global = document.cookie.match(new RegExp('(?:^|;) *' + escape((global ? '' : cookie_prefix) + key) + '=([^;]*)(?:;|$)'))), global && global[0] ? unescape(global[1]) : null);
             },
 
@@ -158,6 +182,7 @@ window.initStorer = function (callback, params) {
                 if (!key || key === 'expires' || key === 'max-age' || key === 'path' || key === 'domain' || key === 'secure') {
                     return false;
                 }
+
                 var sExpires = "";
                 if (end) {
                     switch (typeof end) {
@@ -174,12 +199,17 @@ window.initStorer = function (callback, params) {
                             break;
                     }
                 }
+
                 if (value !== undefined && value !== null) {
                     domain = (domain = typeof domain === 'string' ? escape(domain) : _cookieStorage.DEFAULT_DOMAIN) ? '; domain=' + domain : '';
                     path   = (path   = typeof path   === 'string' ? escape(path)   : _cookieStorage.DEFAULT_PATH)   ? '; path=' + path : '';
                     document.cookie = escape((global ? '' : cookie_prefix) + key) + '=' + escape(value) + sExpires + domain + path + (is_secure ? '; secure' : '');
+
+                    _updateLength();
+
                     return true;
                 }
+
                 return _cookieStorage.removeItem(key, domain, path, is_secure, global);
             },
 
@@ -196,9 +226,13 @@ window.initStorer = function (callback, params) {
                 if (!key || !this.hasItem(key, global)) {
                     return false;
                 }
+
                 domain = (domain = typeof domain === 'string' ? escape(domain) : _cookieStorage.DEFAULT_DOMAIN) ? '; domain=' + domain : '';
                 path   = (path   = typeof path   === 'string' ? escape(path)   : _cookieStorage.DEFAULT_PATH)   ? '; path=' + path : '';
                 document.cookie = escape((global ? '' : cookie_prefix) + key) + '=; expires=' + _expire + domain + path + (is_secure ? '; secure' : '');
+
+                _updateLength();
+
                 return true;
             },
 
@@ -211,6 +245,14 @@ window.initStorer = function (callback, params) {
             hasItem: function (key, global) {
                 return (new RegExp('(?:^|;) *' + escape((global ? '' : cookie_prefix) + key) + '=')).test(document.cookie);
             }
+        };
+
+        /**
+         * Updates cookieStorage.length on update
+         * @private
+         */
+        var _updateLength = function () {
+            _cookieStorage.length = _cookieStorage.getAll().length;
         };
 
         _cookieStorage.setItem(_TESTID, 4);

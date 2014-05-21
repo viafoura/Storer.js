@@ -88,31 +88,28 @@
                 });
 
                 test('cookieStorage', function () {
-                    expect(7);
+                    expect(14);
 
                     ok(cookieStorage.getItem,       'cookieStorage.getItem exists');
                     ok(cookieStorage.setItem,       'cookieStorage.setItem exists');
                     ok(cookieStorage.removeItem,    'cookieStorage.removeItem exists');
-                    // @todo cookieStorage.clear
-                    //ok(cookieStorage.clear,         'cookieStorage.clear exists');
-                    // @todo cookieStorage.key
-                    //ok(cookieStorage.key,           'cookieStorage.key exists');
-                    // @todo cookieStorage.length
-                    //equal(typeof cookieStorage.length, 'number', 'cookieStorage.length is a number');
+                    ok(cookieStorage.clear,         'cookieStorage.clear exists');
+                    ok(cookieStorage.key,           'cookieStorage.key exists');
+                    equal(typeof cookieStorage.length, 'number', 'cookieStorage.length is a number');
 
                     equal(localStorage.getItem('__cookieStorage'), null, 'getItem should be empty (last run verification)');
                     cookieStorage.setItem('__cookieStorage', n + 1);
                     equal(cookieStorage.getItem('__cookieStorage'), n + 1, 'setItem ' + (n + 1));
                     cookieStorage.setItem('__cookieStorage', n + 2);
                     equal(cookieStorage.getItem('__cookieStorage'), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
-                    //ok(cookieStorage.key(0), 'key(0) exists');
-                    //ok(cookieStorage.length > 0, 'length > 0');
+                    ok(cookieStorage.key(0), 'key(0) exists');
+                    ok(cookieStorage.length > 0, 'length > 0');
                     cookieStorage.removeItem('__cookieStorage');
                     equal(cookieStorage.getItem('__cookieStorage'), null, 'removeItem');
-                    //cookieStorage.setItem('__cookieStorage', 3);
-                    //equal(cookieStorage.getItem('__cookieStorage'), 3, 'setItem ' + (n + 3));
-                    //cookieStorage.clear();
-                    //equal(cookieStorage.getItem('__cookieStorage'), null, 'clear');
+                    cookieStorage.setItem('__cookieStorage', 3);
+                    equal(cookieStorage.getItem('__cookieStorage'), 3, 'setItem ' + (n + 3));
+                    cookieStorage.clear();
+                    equal(cookieStorage.getItem('__cookieStorage'), null, 'clear');
                 });
 
                 test('sessionStorage', function () {
