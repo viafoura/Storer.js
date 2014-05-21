@@ -2,18 +2,18 @@
     // i=1 without prefix, i=0 with prefix
     for (var i = 2, fn; i--;) {
         fn = function (i) {
-            var memoryStorage, cookieStorage, sessionStorage, localStorage, _finished, n = i * 10;
+            var Storer, memoryStorage, cookieStorage, sessionStorage, localStorage, _finished, n = i * 10;
 
             module('Storer.js with' + (i ? 'out' : '') + ' a prefix');
 
             test('Initialization', function () {
-                var Storer, _success;
+                var _success;
                 expect(6);
 
                 stop(2);
 
                 ok(
-                    Storer = initStorer(
+                    initStorer(
                         {
                             prefix: i ? '' : '__StorerTestPrefix__'
                         }
@@ -39,13 +39,6 @@
                     'initStorer should always return an object'
                 );
 
-                // Synchronous definitions
-                memoryStorage  = Storer.memoryStorage;
-                cookieStorage  = Storer.cookieStorage;
-                sessionStorage = Storer.sessionStorage;
-                // localStorage exists but not useable in IE7 synchronously; must use asynchronous callback
-                localStorage   = Storer.localStorage;
-
                 start();
 
                 setTimeout(function () {
@@ -62,105 +55,64 @@
                 }
                 _finished = true;
 
-                test('memoryStorage', function () {
-                    expect(14);
+                var substorages = ['localStorage', 'sessionStorage', 'cookieStorage', 'memoryStorage'],
+                    i = substorages.length;
 
-                    ok(memoryStorage.getItem,       'memoryStorage.getItem exists');
-                    ok(memoryStorage.setItem,       'memoryStorage.setItem exists');
-                    ok(memoryStorage.removeItem,    'memoryStorage.removeItem exists');
-                    ok(memoryStorage.clear,         'memoryStorage.clear exists');
-                    ok(memoryStorage.key,           'memoryStorage.key exists');
-                    equal(typeof memoryStorage.length, 'number', 'memoryStorage.length is a number');
+                while (i--) {
+                    test(substorages[i], (function (subtest) {
+                        return function () {
+                            expect(18);
 
-                    equal(localStorage.getItem('__memoryStorage'), null, 'getItem should be empty (last run verification)');
-                    memoryStorage.setItem('__memoryStorage', n + 1);
-                    equal(memoryStorage.getItem('__memoryStorage'), n + 1, 'setItem ' + (n + 1));
-                    memoryStorage.setItem('__memoryStorage', n + 2);
-                    equal(memoryStorage.getItem('__memoryStorage'), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
-                    ok(memoryStorage.key(0), 'key(0) exists');
-                    ok(memoryStorage.length > 0, 'length > 0');
-                    memoryStorage.removeItem('__memoryStorage');
-                    equal(memoryStorage.getItem('__memoryStorage'), null, 'removeItem');
-                    memoryStorage.setItem('__memoryStorage', n + 3);
-                    equal(memoryStorage.getItem('__memoryStorage'), n + 3, 'setItem ' + (n + 3));
-                    memoryStorage.clear();
-                    equal(memoryStorage.getItem('__memoryStorage'), null, 'clear');
-                });
+                            var substorage = Storer[subtest];
 
-                test('cookieStorage', function () {
-                    expect(14);
+                            ok(substorage.getItem,       subtest + '.getItem exists');
+                            ok(substorage.setItem,       subtest + '.setItem exists');
+                            ok(substorage.removeItem,    subtest + '.removeItem exists');
+                            ok(substorage.clear,         subtest + '.clear exists');
+                            ok(substorage.key,           subtest + '.key exists');
+                            equal(typeof substorage.length, 'number', subtest + '.length is a number');
 
-                    ok(cookieStorage.getItem,       'cookieStorage.getItem exists');
-                    ok(cookieStorage.setItem,       'cookieStorage.setItem exists');
-                    ok(cookieStorage.removeItem,    'cookieStorage.removeItem exists');
-                    ok(cookieStorage.clear,         'cookieStorage.clear exists');
-                    ok(cookieStorage.key,           'cookieStorage.key exists');
-                    equal(typeof cookieStorage.length, 'number', 'cookieStorage.length is a number');
+                            // Get nothing
+                            equal(localStorage.getItem('__' + subtest), null, 'getItem should be empty (last run verification)');
 
-                    equal(localStorage.getItem('__cookieStorage'), null, 'getItem should be empty (last run verification)');
-                    cookieStorage.setItem('__cookieStorage', n + 1);
-                    equal(cookieStorage.getItem('__cookieStorage'), n + 1, 'setItem ' + (n + 1));
-                    cookieStorage.setItem('__cookieStorage', n + 2);
-                    equal(cookieStorage.getItem('__cookieStorage'), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
-                    ok(cookieStorage.key(0), 'key(0) exists');
-                    ok(cookieStorage.length > 0, 'length > 0');
-                    cookieStorage.removeItem('__cookieStorage');
-                    equal(cookieStorage.getItem('__cookieStorage'), null, 'removeItem');
-                    cookieStorage.setItem('__cookieStorage', 3);
-                    equal(cookieStorage.getItem('__cookieStorage'), 3, 'setItem ' + (n + 3));
-                    cookieStorage.clear();
-                    equal(cookieStorage.getItem('__cookieStorage'), null, 'clear');
-                });
+                            // Set
+                            substorage.setItem('__' + subtest, n + 1);
+                            equal(substorage.getItem('__' + subtest), n + 1, 'setItem ' + (n + 1));
 
-                test('sessionStorage', function () {
-                    expect(14);
+                            substorage.setItem('__' + subtest, n + 2);
+                            equal(substorage.getItem('__' + subtest), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
 
-                    ok(sessionStorage.getItem,      'sessionStorage.getItem exists');
-                    ok(sessionStorage.setItem,      'sessionStorage.setItem exists');
-                    ok(sessionStorage.removeItem,   'sessionStorage.removeItem exists');
-                    ok(sessionStorage.clear,        'sessionStorage.clear exists');
-                    ok(sessionStorage.key,          'sessionStorage.key exists');
-                    equal(typeof sessionStorage.length, 'number', 'sessionStorage.length is a number');
+                            // Key & length from set
+                            ok(substorage.key(0), 'key(0) exists');
+                            ok(substorage.length > 0, 'length > 0');
 
-                    equal(localStorage.getItem('__sessionStorage'), null, 'getItem should be empty (last run verification)');
-                    sessionStorage.setItem('__sessionStorage', n + 1);
-                    equal(sessionStorage.getItem('__sessionStorage'), n + 1, 'setItem ' + (n + 1));
-                    sessionStorage.setItem('__sessionStorage', n + 2);
-                    equal(sessionStorage.getItem('__sessionStorage'), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
-                    ok(sessionStorage.key(0), 'key(0) exists');
-                    ok(sessionStorage.length > 0, 'length > 0');
-                    sessionStorage.removeItem('__sessionStorage');
-                    equal(sessionStorage.getItem('__sessionStorage'), null, 'removeItem');
-                    sessionStorage.setItem('__sessionStorage', n + 3);
-                    equal(sessionStorage.getItem('__sessionStorage'), n + 3, 'setItem ' + (n + 3));
-                    sessionStorage.clear();
-                    equal(sessionStorage.getItem('__sessionStorage'), null, 'clear');
-                });
+                            // Remove
+                            substorage.removeItem('__' + subtest);
+                            equal(substorage.getItem('__' + subtest), null, 'removeItem');
 
-                test('localStorage', function () {
-                    expect(14);
+                            // Set
+                            substorage.setItem('__' + subtest, n + 3);
+                            equal(substorage.getItem('__' + subtest), n + 3, 'setItem ' + (n + 3));
 
-                    ok(localStorage.getItem,       'localStorage.getItem exists');
-                    ok(localStorage.setItem,       'localStorage.setItem exists');
-                    ok(localStorage.removeItem,    'localStorage.removeItem exists');
-                    ok(localStorage.clear,         'localStorage.clear exists');
-                    ok(localStorage.key,           'localStorage.key exists');
-                    equal(typeof localStorage.length, 'number', 'localStorage.length is a number');
+                            // Expiry
+                            substorage.setItem('__' + subtest, n + 4, -1); // Number
+                            equal(substorage.getItem('__' + subtest), null, 'setItem ' + (n + 4) + ', expires:' + -1);
 
-                    equal(localStorage.getItem('__localStorage'), null, 'getItem should be empty (last run verification)');
-                    localStorage.setItem('__localStorage', n + 1);
-                    equal(localStorage.getItem('__localStorage'), n + 1, 'setItem ' + (n + 1));
-                    localStorage.setItem('__localStorage', n + 2);
-                    equal(localStorage.getItem('__localStorage'), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
-                    ok(localStorage.key(0), 'key(0) exists');
-                    ok(localStorage.length > 0, 'length > 0');
-                    localStorage.removeItem('__localStorage');
-                    equal(localStorage.getItem('__localStorage'), null, 'removeItem');
-                    localStorage.setItem('__localStorage', n + 3);
-                    equal(localStorage.getItem('__localStorage'), n + 3, 'setItem ' + (n + 3));
-                    localStorage.clear(i);
-                    equal(localStorage.getItem('__localStorage'), null, 'clear');
-                });
+                            substorage.setItem('__' + subtest, n + 5, 0); // Number
+                            equal(substorage.getItem('__' + subtest), n + 5, 'setItem ' + (n + 5) + ', expires:' + 0);
+
+                            substorage.setItem('__' + subtest, n + 6, new Date(2038, 0, 1)); // Date
+                            equal(substorage.getItem('__' + subtest), n + 6, 'setItem ' + (n + 6) + ', expires:' + new Date(2038, 0, 1));
+
+                            substorage.setItem('__' + subtest, n + 7, ("" + parseInt(+new Date / 1000 + 10, 10))); // String
+                            equal(substorage.getItem('__' + subtest), n + 7, 'setItem ' + (n + 7) + ', expires:' + ("" + parseInt(+new Date / 1000 + 10, 10)));
+
+                            // Clear
+                            substorage.clear();
+                            strictEqual(substorage.getItem('__' + subtest), null, 'clear');
+                        }
+                    }(substorages[i])));
+                }
             });
         };
 
