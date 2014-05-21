@@ -62,6 +62,8 @@
  * @return {Object} cookieStorage, localStorage, memoryStorage, sessionStorage
  */
 window.initStorer = function (callback, params) {
+    "use strict";
+
     var _TESTID            = '__SG__',
         top                = window,
         PREFIX             = (params = Object.prototype.toString.call(callback) === "[object Object]" ? callback : (params || {})).prefix || '',
@@ -741,6 +743,7 @@ window.initStorer = function (callback, params) {
                 var _tmp = function () {
                 };
                 _tmp.prototype = _sessionStorage;
+                // jshint -W055
                 _tmp = new _tmp();
                 try {
                     if (_tmp.getItem) {
@@ -836,6 +839,7 @@ window.initStorer = function (callback, params) {
                 // Now clone sessionStorage so that we may extend it with our own methods
                 var _tmp = function () {};
                 _tmp.prototype = _localStorage;
+                // jshint -W055
                 _tmp = new _tmp();
                 try {
                     if (_tmp.getItem) {
