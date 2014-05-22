@@ -142,7 +142,7 @@ function initStorer(callback, params) {
         switch (typeof end) {
             case "number":
                 // Max-age, although we allow end=0 to mimic 0 for cookies
-                end = end && parseInt(now / 1000 + end, 10);
+                end = end && parseInt(now + end, 10);
                 break;
             case "string":
                 // timestamp or Date string

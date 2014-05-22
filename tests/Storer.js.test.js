@@ -2,7 +2,7 @@
     // i=1 without prefix, i=0 with prefix
     for (var i = 2, fn; i--;) {
         fn = function (i) {
-            var Storer, memoryStorage, cookieStorage, sessionStorage, localStorage, _finished, n = i * 10;
+            var Storer, memoryStorage, cookieStorage, sessionStorage, localStorage, _finished, n = i * 100;
 
             module('Storer.js with' + (i ? 'out' : '') + ' a prefix');
 
@@ -61,7 +61,7 @@
                 while (j--) {
                     test(substorages[j], (function (subtest) {
                         return function () {
-                            expect(19);
+                            expect(22);
 
                             var substorage = Storer[subtest],
                                 test_key = '--' + subtest + 'Key--';
@@ -104,11 +104,20 @@
                             substorage.setItem(test_key, n + 5, 0); // Number
                             equal(substorage.getItem(test_key), n + 5, 'setItem ' + (n + 5) + ', expires:' + 0);
 
-                            substorage.setItem(test_key, n + 6, new Date(2038, 0, 1)); // Date
-                            equal(substorage.getItem(test_key), n + 6, 'setItem ' + (n + 6) + ', expires:' + new Date(2038, 0, 1));
+                            substorage.setItem(test_key, n + 6, 10); // Number
+                            equal(substorage.getItem(test_key), n + 6, 'setItem ' + (n + 6) + ', expires:' + 10);
 
-                            substorage.setItem(test_key, n + 7, ("" + parseInt(+new Date / 1000 + 10, 10))); // String
-                            equal(substorage.getItem(test_key), n + 7, 'setItem ' + (n + 7) + ', expires:' + ("" + parseInt(+new Date / 1000 + 10, 10)));
+                            substorage.setItem(test_key, n + 7, new Date(1979, 0, 1)); // Date
+                            equal(substorage.getItem(test_key), null, 'setItem ' + (n + 7) + ', expires:' + new Date(1979, 0, 1));
+
+                            substorage.setItem(test_key, n + 8, new Date(2038, 0, 1)); // Date
+                            equal(substorage.getItem(test_key), n + 8, 'setItem ' + (n + 8) + ', expires:' + new Date(2038, 0, 1));
+
+                            substorage.setItem(test_key, n + 9, ("" + parseInt(+new Date / 1000 - 100, 10))); // String
+                            equal(substorage.getItem(test_key), null, 'setItem ' + (n + 9) + ', expires:' + ("" + parseInt(+new Date / 1000 - 100, 10)));
+
+                            substorage.setItem(test_key, n + 10, ("" + parseInt(+new Date / 1000 + 10, 10))); // String
+                            equal(substorage.getItem(test_key), n + 10, 'setItem ' + (n + 10) + ', expires:' + ("" + parseInt(+new Date / 1000 + 10, 10)));
 
                             // Clear
                             substorage.clear();
