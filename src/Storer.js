@@ -1147,8 +1147,9 @@ function initStorer(callback, params) {
             }
         }
 
-        // Did not work, try userData, cookie, or memory:
+        // Did not work, try alternatives...
         //@ifndef LIGHT
+        // Try userData first
         if (!_localStorage) {
             _localStorage = (function () {
                 /**
@@ -1331,6 +1332,7 @@ function initStorer(callback, params) {
         //@endif
 
         if (!_localStorage) {
+            // Try cookie or memory
             _localStorage = NO_COOKIE_FALLBACK ? _createMemoryStorage() : _createCookieStorage('localStorage');
         }
 

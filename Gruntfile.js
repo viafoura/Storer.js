@@ -71,7 +71,7 @@ module.exports = function(grunt) {
             // Change top of header for light version
             if (filename.match('light')) {
                 output = "/*! Storer.js (light)\n"
-                    + " * This light version removes userData and window.name storage. It is incompatible Internet Explorer prior to IE8.\n"
+                    + " * This light version removes userData and window.name storage. In Internet Explorer prior to IE8, they will fall back to cookieStorage and memoryStorage, respectively.\n"
             } else {
                 output = "/*! Storer.js\n";
             }

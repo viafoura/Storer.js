@@ -1141,7 +1141,8 @@ function initStorer(callback, params) {
             }
         }
 
-        // Did not work, try userData, cookie, or memory:
+        // Did not work, try alternatives...
+        // Try userData first
         if (!_localStorage) {
             _localStorage = (function () {
                 /**
@@ -1322,6 +1323,7 @@ function initStorer(callback, params) {
             }());
         }
         if (!_localStorage) {
+            // Try cookie or memory
             _localStorage = NO_COOKIE_FALLBACK ? _createMemoryStorage() : _createCookieStorage('localStorage');
         }
 

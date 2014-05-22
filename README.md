@@ -12,7 +12,7 @@ All of its storage subsystems implement `getItem`, `setItem`, `removeItem`, `cle
 In a worst-case scenario, all of the storages are `memoryStorage`, which means the data will not persist across pages. In a best-case scenario, each of the storage types are implemented using native `sessionStorage` and `localStorage` with cookie support as well with `cookieStorage`.
 
 ### Light Version (IE8+ only)
-`Storer-light.min.js` has userData and window.name support removed, reducing the minified filesize by approximately 40%. If you do not need IE6 or IE7 support, this version will enable you to still retain the other fallbacks (cookie and memory). This version does not require using the callback function (see example below "using return").
+`Storer-light.min.js` has userData and window.name support removed, reducing the minified filesize by approximately 40%. If you do not need IE6 or IE7 support, this version will enable you to still retain the other fallbacks (cookie and memory). This version does not require using the callback function (see example below "using return"). It WILL work in those browsers, however, localStorage will fall back to cookies, and sessionStorage will fall back to memory.
 
 ### Examples
 Using callback and a custom prefix (callback supports IE7 and lower):

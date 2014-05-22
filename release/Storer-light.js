@@ -1,5 +1,5 @@
 /*! Storer.js (light)
- * This light version removes userData and window.name storage. It is incompatible Internet Explorer prior to IE8.
+ * This light version removes userData and window.name storage. In Internet Explorer prior to IE8, they will fall back to cookieStorage and memoryStorage, respectively.
  * @copyright Viafoura, Inc. <viafoura.com>
  * @author Shahyar G <github.com/shahyar>, originally for <github.com/viafoura>
  * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.
@@ -754,8 +754,9 @@ function initStorer(callback, params) {
             }
         }
 
-        // Did not work, try userData, cookie, or memory:
+        // Did not work, try alternatives...
         if (!_localStorage) {
+            // Try cookie or memory
             _localStorage = NO_COOKIE_FALLBACK ? _createMemoryStorage() : _createCookieStorage('localStorage');
         }
 
