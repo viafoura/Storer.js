@@ -56,14 +56,15 @@
                 _finished = true;
 
                 var substorages = ['localStorage', 'sessionStorage', 'cookieStorage', 'memoryStorage'],
-                    i = substorages.length;
+                    j = substorages.length;
 
-                while (i--) {
-                    test(substorages[i], (function (subtest) {
+                while (j--) {
+                    test(substorages[j], (function (subtest) {
                         return function () {
-                            expect(18);
+                            expect(19);
 
-                            var substorage = Storer[subtest];
+                            var substorage = Storer[subtest],
+                                test_key = '--' + subtest + 'Key--';
 
                             ok(substorage.getItem,       subtest + '.getItem exists');
                             ok(substorage.setItem,       subtest + '.setItem exists');
@@ -73,45 +74,47 @@
                             equal(typeof substorage.length, 'number', subtest + '.length is a number');
 
                             // Get nothing
-                            equal(localStorage.getItem('__' + subtest), null, 'getItem should be empty (last run verification)');
+                            equal(localStorage.getItem(test_key), null, 'getItem should be empty (last run verification)');
+
 
                             // Set
-                            substorage.setItem('__' + subtest, n + 1);
-                            equal(substorage.getItem('__' + subtest), n + 1, 'setItem ' + (n + 1));
+                            substorage.setItem(test_key, n + 1);
+                            equal(substorage.getItem(test_key), n + 1, 'setItem ' + (n + 1));
 
-                            substorage.setItem('__' + subtest, n + 2);
-                            equal(substorage.getItem('__' + subtest), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
+                            substorage.setItem(test_key, n + 2);
+                            equal(substorage.getItem(test_key), n + 2, 'setItem ' + (n + 2) + ' (overwrite)');
 
                             // Key & length from set
                             ok(substorage.key(0), 'key(0) exists');
                             ok(substorage.length > 0, 'length > 0');
+                            equal(localStorage.key(1), undefined, 'key(1) should be empty');
 
                             // Remove
-                            substorage.removeItem('__' + subtest);
-                            equal(substorage.getItem('__' + subtest), null, 'removeItem');
+                            substorage.removeItem(test_key);
+                            equal(substorage.getItem(test_key), null, 'removeItem');
 
                             // Set
-                            substorage.setItem('__' + subtest, n + 3);
-                            equal(substorage.getItem('__' + subtest), n + 3, 'setItem ' + (n + 3));
+                            substorage.setItem(test_key, n + 3);
+                            equal(substorage.getItem(test_key), n + 3, 'setItem ' + (n + 3));
 
                             // Expiry
-                            substorage.setItem('__' + subtest, n + 4, -1); // Number
-                            equal(substorage.getItem('__' + subtest), null, 'setItem ' + (n + 4) + ', expires:' + -1);
+                            substorage.setItem(test_key, n + 4, -1); // Number
+                            equal(substorage.getItem(test_key), null, 'setItem ' + (n + 4) + ', expires:' + -1);
 
-                            substorage.setItem('__' + subtest, n + 5, 0); // Number
-                            equal(substorage.getItem('__' + subtest), n + 5, 'setItem ' + (n + 5) + ', expires:' + 0);
+                            substorage.setItem(test_key, n + 5, 0); // Number
+                            equal(substorage.getItem(test_key), n + 5, 'setItem ' + (n + 5) + ', expires:' + 0);
 
-                            substorage.setItem('__' + subtest, n + 6, new Date(2038, 0, 1)); // Date
-                            equal(substorage.getItem('__' + subtest), n + 6, 'setItem ' + (n + 6) + ', expires:' + new Date(2038, 0, 1));
+                            substorage.setItem(test_key, n + 6, new Date(2038, 0, 1)); // Date
+                            equal(substorage.getItem(test_key), n + 6, 'setItem ' + (n + 6) + ', expires:' + new Date(2038, 0, 1));
 
-                            substorage.setItem('__' + subtest, n + 7, ("" + parseInt(+new Date / 1000 + 10, 10))); // String
-                            equal(substorage.getItem('__' + subtest), n + 7, 'setItem ' + (n + 7) + ', expires:' + ("" + parseInt(+new Date / 1000 + 10, 10)));
+                            substorage.setItem(test_key, n + 7, ("" + parseInt(+new Date / 1000 + 10, 10))); // String
+                            equal(substorage.getItem(test_key), n + 7, 'setItem ' + (n + 7) + ', expires:' + ("" + parseInt(+new Date / 1000 + 10, 10)));
 
                             // Clear
                             substorage.clear();
-                            strictEqual(substorage.getItem('__' + subtest), null, 'clear');
+                            strictEqual(substorage.getItem(test_key), null, 'clear');
                         }
-                    }(substorages[i])));
+                    }(substorages[j])));
                 }
             });
         };

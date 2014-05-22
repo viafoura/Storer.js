@@ -57,7 +57,7 @@
  *                 {String}  [default_path='']           default path for cookies
  *                 {Boolean} [no_cookie_fallback=false]  If true, do not use cookies as fallback for localStorage
  * @return {Object} {cookieStorage, localStorage, memoryStorage, sessionStorage}
- * @version 0.1.0
+ * @version 0.1.1
  */
 function initStorer(callback, params) {
     "use strict";
@@ -69,8 +69,8 @@ function initStorer(callback, params) {
         _callbackNow       = true,
         cookieStorage, localStorage, memoryStorage, sessionStorage;
 
-    // Allow passing params without callback
     if (params === callback) {
+        // Allow passing params without callback
         callback = null;
     }
 
@@ -103,18 +103,18 @@ function initStorer(callback, params) {
      * JSONified. If data._end exists, also runs _checkEnd. When not a valid JSON object, returns str back.
      * @param {String|*} str
      * @param {Function} [remove_callback]
-     * @param {String} [remove_callback_key]
+     * @param {String} [callback_key]
      * @returns {*}
      * @private
      */
-    function _getJSON(str, remove_callback, remove_callback_key) {
+    function _getJSON(str, remove_callback, callback_key) {
         try {
             var obj = str && JSON.parse(str);
             if (obj) {
                 // Backwards compatibility for 0.0.4, when _end did not exist
                 if (obj._end !== undefined) {
                     // Check for expiry
-                    return _checkEnd(obj._end, obj.value, remove_callback, remove_callback_key);
+                    return _checkEnd(obj._end, obj.value, remove_callback, callback_key);
                 }
             }
         } catch (e) {}
@@ -124,15 +124,19 @@ function initStorer(callback, params) {
     }
 
     /**
-     * Puts data and end (standardized to seconds) in an object, JSONifies if necessary, and returns it for storage.
-     * If end is valid and end > now, data = null.
+     * Puts data and end (standardized to seconds) in an object, and returns it for use.
+     * If end is valid and end > now, data = null, and remove_callback is called,
+     * otherwise, set_callback is called.
      * @param {Object|*} data
      * @param {String|Number|Date} [end]
+     * @param {Function} [set_callback]
+     * @param {Function} [remove_callback]
+     * @param {String} [callback_key]
      * @param {Boolean} [json]
      * @returns {*}
      * @private
      */
-    function _storeEnd(data, end, json) {
+    function _storeEnd(data, end, set_callback, remove_callback, callback_key, json) {
         var now = parseInt(+new Date() / 1000, 10);
 
         switch (typeof end) {
@@ -154,10 +158,40 @@ function initStorer(callback, params) {
                 end = null;
         }
 
-        // Automatically expire this item if now > end
         data = { value: end && now > end ? null : data, _end: end || null };
 
-        return json ? JSON.stringify(data) : data;
+        if (data.value === null || data.value === undefined) {
+            // Automatically expire this item
+            remove_callback && remove_callback(callback_key);
+        } else if (json) {
+            // Set the data with JSON
+            set_callback && set_callback(callback_key, JSON.stringify(data._end ? data : data.value));
+        } else {
+            // Set the data
+            set_callback && set_callback(callback_key, data._end ? data : data.value);
+        }
+
+        return data;
+    }
+
+    /**
+     * Clears expired data from each storage subsystem.
+     * @private
+     */
+    function _clearExpired() {
+        var i, j, key;
+        // Iterate over every storage subsystem
+        for (i in _returnable) {
+            // Ignore memoryStorage, as it doesn't have anything to expire
+            if (_returnable.hasOwnProperty(i) && i.charAt(0) !== '_' && _returnable[i].STORE_TYPE !== 'memoryStorage') {
+                j = 0;
+                // Iterate over every key in this subsystem
+                while ((key = _returnable[i].key(j++))) {
+                    // getItem automatically handles removing expired items
+                    _returnable[i].getItem(key);
+                }
+            }
+        }
     }
 
     /**
@@ -173,10 +207,10 @@ function initStorer(callback, params) {
                 return StoreRef.key(key);
             },
             getItem: function (key) {
-                return _getJSON(StoreRef.getItem(key), this._removeItem || this.removeItem, key);
+                return StoreRef.getItem(key);
             },
             setItem: function (key, value, end) {
-                return StoreRef.setItem(key, _storeEnd(value, end, true));
+                return StoreRef.setItem(key, value, end);
             },
             removeItem: function (key) {
                 return StoreRef.removeItem(key);
@@ -199,16 +233,147 @@ function initStorer(callback, params) {
         var store = document.createElement('div');
         store.STORE_TYPE    = 'DOM' + name;
         store.key           = StoreRef.key;
+        store.getItem       = StoreRef.getItem;
+        store.setItem       = StoreRef.setItem;
         store.removeItem    = StoreRef.removeItem;
         store.clear         = StoreRef.clear;
-        store.getItem       = function (key) {
-            return _getJSON(StoreRef.getItem(key), this._removeItem || this.removeItem, key);
-        };
-        store.setItem       = function (key, value, end) {
-            return StoreRef.setItem(key, _storeEnd(value, end, true));
-        };
         Object.defineProperty(store, "length", { get: function () { return StoreRef.length; } });
         return store;
+    }
+
+    /**
+     * Amends getItem and setItem to support expiry times for HTML5 Storage.
+     * @param {Object|Storage} StoreRef
+     * @return {Object}
+     * @private
+     */
+    function _adjustHTML5Storage(StoreRef) {
+        var _getItem = StoreRef.getItem,
+            _setItem = StoreRef.setItem,
+            _removeItem = StoreRef._removeItem || StoreRef.removeItem,
+            _removeItemCallback = function (key) {
+                _removeItem(key);
+            };
+
+        StoreRef.getItem       = function (key) {
+            return _getJSON(_getItem(key), _removeItemCallback, key);
+        };
+        StoreRef.setItem       = function (key, data, end) {
+            return _storeEnd(
+                data,
+                end,
+                function (key, value) {
+                    _setItem(key, value);
+                },
+                _removeItemCallback,
+                key,
+                true
+            );
+        };
+
+        return StoreRef;
+    }
+
+    /**
+     *
+     * @param {Object|Storage} StoreRef
+     * @returns {*}
+     * @private
+     */
+    function _assignPrefix(StoreRef) {
+        // Use the rest of the object natively without a prefix
+        // memoryStorage doesn't need prefixes
+        if (!PREFIX || StoreRef.STORE_TYPE === 'memoryStorage') {
+            return StoreRef;
+        }
+
+        // Rewire functions to use a prefix and avoid collisions
+        // @todo Rewire length for prefixes as well
+        StoreRef._getItem    = StoreRef.getItem;
+        StoreRef._setItem    = StoreRef.setItem;
+        StoreRef._removeItem = StoreRef.removeItem;
+        StoreRef._key        = StoreRef.key;
+
+        /** Variable # of items in Storage.
+         * @const int length
+         * @memberof sessionStorage
+         * @memberof localStorage */
+
+        /**
+         * Returns an item from the current type of Storage.
+         * @param {String} key
+         * @returns {*}
+         * @memberof sessionStorage
+         * @memberof localStorage
+         */
+        StoreRef.getItem    = function (key) {
+            return StoreRef._getItem(PREFIX + key);
+        };
+
+        /**
+         * Sets an item in the current type of Storage.
+         * end is expiry: Number = seconds from now, String = date string for Date(), or Date object.
+         * @param {String} key
+         * @param {*} data
+         * @param {int|String|Date} [end]
+         * @memberof sessionStorage
+         * @memberof localStorage
+         */
+        StoreRef.setItem    = function (key, data, end) {
+            return StoreRef._setItem(PREFIX + key, data, end);
+        };
+
+        /**
+         * Removes key from the current Storage instance, if it has been set.
+         * @param {String} key
+         * @memberof sessionStorage
+         * @memberof localStorage
+         */
+        StoreRef.removeItem = function (key) {
+            return StoreRef._removeItem(PREFIX + key);
+        };
+
+        StoreRef._key        = StoreRef.key;
+        /**
+         * Gets the key (if any) at index, from the current Storage instance.
+         * @param {int} index
+         * @returns {String|null}
+         * @memberof sessionStorage
+         * @memberof localStorage
+         */
+        StoreRef.key        = function (index) {
+            if ((index = StoreRef._key(index)) !== undefined && index !== null) {
+                // Chop off the index
+                return index.indexOf(PREFIX) === 0 ? index.substr(PREFIX.length) : index;
+            }
+            return null;
+        };
+
+        if (StoreRef.STORE_TYPE !== 'cookieStorage') {
+            // cookieStorage has its own clear which supports prefixes
+            /**
+             * Removes all the current keys from this Storage instance.
+             * @memberof sessionStorage
+             * @memberof localStorage
+             */
+            StoreRef.clear      = function () {
+                for (var i = StoreRef.length, key; i--;) {
+                    if ((key = StoreRef._key(i)).indexOf(PREFIX) === 0) {
+                        StoreRef._removeItem(key);
+                    }
+                }
+            };
+        } else {
+            // cookieStorage is the only one which implements hasItem
+            if (StoreRef.hasItem) {
+                StoreRef._hasItem = StoreRef.hasItem;
+                StoreRef.hasItem = function (key) {
+                    return StoreRef._hasItem(PREFIX + key);
+                };
+            }
+        }
+
+        return StoreRef;
     }
 
     /**
@@ -217,9 +382,9 @@ function initStorer(callback, params) {
      * @return {cookieStorage|memoryStorage}
      */
     function _createCookieStorage(cookie_prefix) {
-        cookie_prefix        = (cookie_prefix || '') + PREFIX;
-        var _cookiergx       = new RegExp("(?:^|;)\\s*" + cookie_prefix + "[^=;]+\\s*(?:=[^;]*)?", "g"),
-            _nameclean       = new RegExp("^;?\\s*" + cookie_prefix),
+        cookie_prefix        = (cookie_prefix || '');
+        var _cookiergx       = new RegExp("(?:^|;)\\s*" + cookie_prefix + PREFIX + "[^=;]+\\s*(?:=[^;]*)?", "g"),
+            _nameclean       = new RegExp("^;?\\s*" + cookie_prefix + PREFIX),
             _cookiergxGlobal = new RegExp("(?:^|;)\\s*[^=;]+\\s*(?:=[^;]*)?", "g"),
             _namecleanGlobal = new RegExp("^;?\\s*"),
             _expire          = (new Date(1979)).toGMTString(),
@@ -257,7 +422,7 @@ function initStorer(callback, params) {
              */
             key: function (idx, global) {
                 var cookies = this.getAll(false, global);
-                return cookies[0] ? cookies[0].key : undefined;
+                return cookies[idx] ? cookies[idx].key : undefined;
             },
 
             /**
@@ -268,7 +433,9 @@ function initStorer(callback, params) {
             clear: function (global) {
                 var cookies = this.getAll(false, global),
                     i = cookies.length;
+
                 while (i--) {
+                    // Don't use static _removeItemFn reference, because cookieStorage.clear is not handled by _assignPrefix
                     this.removeItem(cookies[i].key);
                 }
             },
@@ -306,7 +473,7 @@ function initStorer(callback, params) {
              * @memberof cookieStorage
              */
             getItem: function (key, global) {
-                if (!key || !this.hasItem(key, global)) {
+                if (!key || !_hasItemFn(key, global)) {
                     return null;
                 }
 
@@ -347,7 +514,7 @@ function initStorer(callback, params) {
                     return true;
                 }
 
-                return _cookieStorage.removeItem(key, domain, path, is_secure, global);
+                return _removeItemFn(key, domain, path, is_secure, global);
             },
 
             /**
@@ -360,7 +527,7 @@ function initStorer(callback, params) {
              * @memberof cookieStorage
              */
             removeItem: function (key, domain, path, is_secure, global) {
-                if (!key || !this.hasItem(key, global)) {
+                if (!key || !_hasItemFn(key, global)) {
                     return;
                 }
 
@@ -381,20 +548,23 @@ function initStorer(callback, params) {
             hasItem: function (key, global) {
                 return (new RegExp('(?:^|;) *' + escape((global ? '' : cookie_prefix) + key) + '=')).test(document.cookie);
             }
-        };
+        },
+        // Keep backups of these functions, as they may be overriden by _assignPrefix
+            _removeItemFn = _cookieStorage.removeItem,
+            _hasItemFn = _cookieStorage.hasItem;
 
         /**
          * Updates cookieStorage.length on update
          * @private
          */
-        var _updateLength = function () {
+        function _updateLength() {
             _cookieStorage.length = _cookieStorage.getAll().length;
-        };
+        }
 
         _cookieStorage.setItem(_TESTID, 4);
         if (_cookieStorage.getItem(_TESTID) == 4) {
             _cookieStorage.removeItem(_TESTID);
-            return _cookieStorage;
+            return _assignPrefix(_cookieStorage);
         }
         return _createMemoryStorage();
     }
@@ -438,7 +608,7 @@ function initStorer(callback, params) {
              * @memberof memoryStorage
              */
             getItem: function (key) {
-                return _checkEnd(_data[key] && _data[key]._end, _data[key], this._removeItem || this.removeItem, key);
+                return _checkEnd(_data[key] && _data[key]._end, _data[key], this.removeItem, key);
             },
 
             /**
@@ -647,7 +817,7 @@ function initStorer(callback, params) {
                  * @return {String|null} data
                  */
                 getItem: function (key) {
-                    return _checkEnd(_dataObject[key] && _dataObject[key]._end, _dataObject[key], this._removeItem || this.removeItem, key);
+                    return _checkEnd(_dataObject[key] && _dataObject[key]._end, _dataObject[key], _removeItemFn, key);
                 },
 
                 /**
@@ -660,7 +830,7 @@ function initStorer(callback, params) {
                     var store_end = _storeEnd(data, end)._end;
 
                     if (store_end.value === null) {
-                        return this.removeItem(key);
+                        return _removeItemFn(key);
                     }
 
                     if (_dataObject[key]) {
@@ -673,8 +843,13 @@ function initStorer(callback, params) {
                             value: data,
                             // For new items, increment the length property
                             index: (_nameStorage.length = _dataArray.push(key)) - 1,
-                            _end: _storeEnd(null, end)._end
+                            _end: store_end._end
                         };
+                    }
+
+                    if (!store_end._end) {
+                        // Save some space
+                        delete _dataObject[key]._end;
                     }
 
                     is_opera && _write();
@@ -721,7 +896,9 @@ function initStorer(callback, params) {
                     _dataObject = {};
                     is_opera && _write();
                 }
-            };
+            },
+            // Keep backups of these functions, as they may be overriden by _assignPrefix
+            _removeItemFn = _nameStorage.removeItem;
 
         // Format: FULLCONTENT:    [SOH]CONTENTPIECECONTENTPIECE...[EOT]
         // Format: CONTENTPIECE:   [STX]keylength[:]contentlength[ETB]key[ETB]content[ETX]
@@ -824,6 +1001,16 @@ function initStorer(callback, params) {
     }
     //@endif
 
+    if (callback) {
+        // Create a callback wrapper to empty expired data preemptively
+        callback = (function (callback) {
+            return function () {
+                callback(_returnable);
+                setTimeout(_clearExpired, 100); // delay expiration
+            };
+        }(callback));
+    }
+
     // Return this stuff
     var _returnable = {
         'cookieStorage':        null,
@@ -846,6 +1033,7 @@ function initStorer(callback, params) {
 
     /**
      * @namespace sessionStorage
+     * @mixes localStorage
      */
     _returnable.sessionStorage = sessionStorage = (function () {
         // Grab sessionStorage from top window
@@ -876,12 +1064,12 @@ function initStorer(callback, params) {
 
                 if (_tmp && !_tmp.getItem) {
                     // Internet Explorer 8 does not inherit the prototype here. We can hack around it using a DOM object
-                    _sessionStorage = _createDOMStorage('sessionstorage', _sessionStorage);
+                    _sessionStorage = _adjustHTML5Storage(_createDOMStorage('sessionStorage', _sessionStorage));
                 } else if (!_tmp || Object.prototype.toString.apply(Storage.prototype) === '[object StoragePrototype]') {
                     // Safari throws a type error when extending with Storage
-                    _sessionStorage = _createReferencedStorage('sessionstorage', _sessionStorage);
+                    _sessionStorage = _adjustHTML5Storage(_createReferencedStorage('sessionStorage', _sessionStorage));
                 } else {
-                    _sessionStorage = _tmp;
+                    _sessionStorage = _adjustHTML5Storage(_tmp);
                 }
             } catch (e) {
                 _sessionStorage = null;
@@ -913,70 +1101,8 @@ function initStorer(callback, params) {
             }
         }
 
-        // Rewire functions to use a prefix and avoid collisions
-        // @todo Rewire length for prefixes as well
-        _sessionStorage._getItem    = _sessionStorage.getItem;
-        _sessionStorage._setItem    = _sessionStorage.setItem;
-        _sessionStorage._removeItem = _sessionStorage.removeItem;
-        _sessionStorage._key        = _sessionStorage.key;
-
-        /** Variable # of items in storage
-         * @const int length
-         * @memberof sessionStorage */
-
-         /**
-         * Returns an item from the current type of sessionStorage.
-         * @param {String} key
-         * @returns {*}
-         * @memberof sessionStorage
-         */
-        _sessionStorage.getItem    = function (key) {
-            return _sessionStorage._getItem(PREFIX + key);
-        };
-        /**
-         * Sets an item in the current type of sessionStorage.
-         * end is expiry: Number = seconds from now, String = date string for Date(), or Date object.
-         * @param {String} key
-         * @param {*} data
-         * @param {int|String|Date} [end]
-         * @memberof sessionStorage
-         */
-        _sessionStorage.setItem    = function (key, data, end) {
-            return _sessionStorage._setItem(PREFIX + key, data, end);
-        };
-        /**
-         * Removes key from the current sessionStorage instance, if it has been set.
-         * @param {String} key
-         * @memberof sessionStorage
-         */
-        _sessionStorage.removeItem = function (key) {
-            return _sessionStorage._removeItem(PREFIX + key);
-        };
-        /**
-         * Gets the key (if any) at index, from the current sessionStorage instance.
-         * @param {int} index
-         * @returns {String|null}
-         * @memberof sessionStorage
-         */
-        _sessionStorage.key        = function (index) {
-            if ((index = _sessionStorage._key(index)) !== undefined && index !== null) {
-                // Chop off the index
-                return index.indexOf(PREFIX) === 0 ? index.substr(PREFIX.length) : index;
-            }
-            return null;
-        };
-        /**
-         * Removes all the current keys from this sessionStorage instance.
-         * @memberof sessionStorage
-         */
-        _sessionStorage.clear      = function () {
-            for (var i = _sessionStorage.length, j; i--;) {
-                if ((j = _sessionStorage._key(i)).indexOf(PREFIX) === 0) {
-                    _sessionStorage._removeItem(j);
-                }
-            }
-        };
-        return _sessionStorage;
+        // cookieStorage already calls _assignPrefix
+        return _sessionStorage.STORE_TYPE === 'cookieStorage' ? _sessionStorage : _assignPrefix(_sessionStorage);
     }());
 
     /**
@@ -1008,13 +1134,13 @@ function initStorer(callback, params) {
 
                 if (_tmp && !_tmp.getItem) {
                     // Internet Explorer 8 does not inherit the prototype here. We can hack around it using a DOM object
-                    _localStorage = _createDOMStorage('localstorage', _localStorage);
+                    _localStorage = _adjustHTML5Storage(_createDOMStorage('localStorage', _localStorage));
                 } else if (!_tmp || Object.prototype.toString.apply(Storage.prototype) === '[object StoragePrototype]') {
                     // Safari throws a type error when extending with Storage
-                    _localStorage = _createReferencedStorage('localstorage', _localStorage);
+                    _localStorage = _adjustHTML5Storage(_createReferencedStorage('localStorage', _localStorage));
                 } else {
                     // Spec
-                    _localStorage = _tmp;
+                    _localStorage = _adjustHTML5Storage(_tmp);
                 }
             } catch (e) {
                 _localStorage = null;
@@ -1074,7 +1200,7 @@ function initStorer(callback, params) {
                                  */
                                 getItem: function (key) {
                                     var esckey = _esc(key);
-                                    return _checkEnd(el.getAttribute('_end_' + esckey), el.getAttribute(esckey), this._removeItem || this.removeItem, key);
+                                    return _checkEnd(el.getAttribute('_end_' + esckey), el.getAttribute(esckey), _removeItemFn, key);
                                 },
 
                                 /**
@@ -1089,13 +1215,18 @@ function initStorer(callback, params) {
                                             store_end = _storeEnd(data, end);
                                         if (store_end.value !== null) {
                                             el.setAttribute(esckey, data);
-                                            el.setAttribute('_end_' + esckey, "" + store_end._end);
+                                            if (!store_end._end) {
+                                                // Save some space
+                                                el.removeAttribute('_end_' + esckey);
+                                            } else {
+                                                el.setAttribute('_end_' + esckey, "" + store_end._end);
+                                            }
                                             _ikey[key] === undefined && (_ikey[key] = (userData.length = _keys.push(key)) - 1);
                                             el.save(_PREFIX + _NAME);
                                             return (_data[key] = store_end.value);
                                         }
                                     }
-                                    return (userData._removeItem || userData.removeItem)(key);
+                                    return _removeItemFn(key);
                                 },
 
                                 /**
@@ -1137,7 +1268,10 @@ function initStorer(callback, params) {
                                     _data = {};
                                     _ikey = {};
                                 }
-                            };
+                            },
+                            // Keep backups of these functions, as they may be overriden by _assignPrefix
+                            _removeItemFn = userData.removeItem,
+                            _hasItemFn = userData.hasItem;
 
                         // Init userData element
                         var el = document.createElement('input');
@@ -1200,76 +1334,8 @@ function initStorer(callback, params) {
             _localStorage = NO_COOKIE_FALLBACK ? _createMemoryStorage() : _createCookieStorage('localStorage');
         }
 
-        // Use the object natively without a prefix
-        if (!PREFIX) {
-            return _localStorage;
-        }
-
-        // Rewire functions to use a prefix and avoid collisions
-        // @todo Rewire length for prefixes as well
-        _localStorage._getItem    = _localStorage.getItem;
-        _localStorage._setItem    = _localStorage.setItem;
-        _localStorage._removeItem = _localStorage.removeItem;
-        _localStorage._key        = _localStorage.key;
-
-        /** Variable # of items in storage
-         * @const int length
-         * @memberof localStorage */
-
-        /**
-         * Returns an item from the current localStorage instance.
-         * @param {String} key
-         * @returns {*}
-         * @memberof localStorage
-         */
-        _localStorage.getItem    = function (key) {
-            return _localStorage._getItem(PREFIX + key);
-        };
-        /**
-         * Sets an item in the current localStorage instance.
-         * end is expiry: Number = seconds from now, String = date string for Date(), or Date object.
-         * @param {String} key
-         * @param {*} data
-         * @param {int|String|Date} [end]
-         * @memberof localStorage
-         */
-        _localStorage.setItem    = function (key, data, end) {
-            return _localStorage._setItem(PREFIX + key, data, end);
-        };
-        /**
-         * Removes key from the current localStorage instance, if it has been set.
-         * @param {String} key
-         * @memberof localStorage
-         */
-        _localStorage.removeItem = function (key) {
-            return _localStorage._removeItem(PREFIX + key);
-        };
-        /**
-         * Gets the key (if any) at index, from the current localStorage instance.
-         * @param {int} index
-         * @returns {String|null}
-         * @memberof localStorage
-         */
-        _localStorage.key        = function (index) {
-            if ((index = _localStorage._key(index)) !== undefined && index !== null) {
-                // Chop off the index
-                return index.indexOf(PREFIX) === 0 ? index.substr(PREFIX.length) : index;
-            }
-            return null;
-        };
-        /**
-         * Removes all the current keys from this localStorage instance.
-         * @memberof localStorage
-         */
-        _localStorage.clear      = function () {
-            for (var i = _localStorage.length, j; i--;) {
-                if ((j = _localStorage._key(i)).indexOf(PREFIX) === 0) {
-                    _localStorage._removeItem(j);
-                }
-            }
-        };
-
-        return _localStorage;
+        // cookieStorage already calls _assignPrefix
+        return _localStorage.STORE_TYPE === 'cookieStorage' ? _localStorage : _assignPrefix(_localStorage);
     }());
 
     _callbackNow && callback && callback(_returnable);
