@@ -32,7 +32,7 @@
  * <br/>
  *
  * @copyright Viafoura, Inc. <viafoura.com>
- * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>
+ * @author Shahyar G <github.com/shahyar>, originally for <github.com/viafoura>
  * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.
  *
  * @example
@@ -49,7 +49,7 @@
  * The callback will fire when all of the necessary types have been created, although it's really only necessary
  * for Internet Explorer's userData storage, which requires domReady to begin.
  *
- * @author Shahyar G <github.com/shahyar> of Viafoura, Inc. <viafoura.com>
+ * @author Shahyar G <github.com/shahyar>, originally for Viafoura, Inc. <viafoura.com>
  * @param {Function} [callback]
  * @param {Object} [params]
  *                 {String}  [prefix='']                 automatic key prefix for sessionStorage and localStorage

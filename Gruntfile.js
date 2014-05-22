@@ -81,7 +81,7 @@ module.exports = function(grunt) {
                 filename,
                 output
                     + " * @copyright Viafoura, Inc. <viafoura.com>\n"
-                    + " * @author Shahyar G <github.com/shahyar> for <github.com/viafoura>\n"
+                    + " * @author Shahyar G <github.com/shahyar>, originally for <github.com/viafoura>\n"
                     + " * @license CC-BY 3.0 <creativecommons.org/licenses/by/3.0>: Keep @copyright, @author intact.\n"
                     + " */"
                     + src.replace(/^\/\*![^]*?\*\//, '').replace(/^\/\*\* Storer\.js[^]*?\*\//, '') // Remove old header
