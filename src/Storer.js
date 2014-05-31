@@ -57,7 +57,7 @@
  *                 {String}  [default_path='']           default path for cookies
  *                 {Boolean} [no_cookie_fallback=false]  If true, do not use cookies as fallback for localStorage
  * @return {Object} {cookieStorage, localStorage, memoryStorage, sessionStorage}
- * @version 0.1.1
+ * @version 0.1.2
  */
 function initStorer(callback, params) {
     "use strict";
@@ -116,6 +116,7 @@ function initStorer(callback, params) {
                     // Check for expiry
                     return _checkEnd(obj._end, obj.value, remove_callback, callback_key);
                 }
+                return obj;
             }
         } catch (e) {}
 

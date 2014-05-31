@@ -61,7 +61,7 @@
                 while (j--) {
                     test(substorages[j], (function (subtest) {
                         return function () {
-                            expect(22);
+                            expect(23);
 
                             var substorage = Storer[subtest],
                                 test_key = '--' + subtest + 'Key--';
@@ -94,8 +94,12 @@
                             equal(substorage.getItem(test_key), null, 'removeItem');
 
                             // Set
+                            // Set a number
                             substorage.setItem(test_key, n + 3);
                             equal(substorage.getItem(test_key), n + 3, 'setItem ' + (n + 3));
+                            // Set a string
+                            substorage.setItem(test_key, "foo");
+                            equal(substorage.getItem(test_key), "foo", 'setItem ' + "foo");
 
                             // Expiry
                             substorage.setItem(test_key, n + 4, -1); // Number

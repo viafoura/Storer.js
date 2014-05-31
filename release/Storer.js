@@ -116,6 +116,7 @@ function initStorer(callback, params) {
                     // Check for expiry
                     return _checkEnd(obj._end, obj.value, remove_callback, callback_key);
                 }
+                return obj;
             }
         } catch (e) {}
 
