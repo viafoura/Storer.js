@@ -61,7 +61,7 @@
                 while (j--) {
                     test(substorages[j], (function (subtest) {
                         return function () {
-                            expect(23);
+                            expect(24);
 
                             var substorage = Storer[subtest],
                                 test_key = '--' + subtest + 'Key--';
@@ -100,6 +100,14 @@
                             // Set a string
                             substorage.setItem(test_key, "foo");
                             equal(substorage.getItem(test_key), "foo", 'setItem ' + "foo");
+                            // Set an object
+                            substorage.setItem(test_key, {foo:"bar"});
+                            if (substorage.STORE_TYPE === 'cookieStorage' || substorage.STORE_TYPE === 'userData') {
+                                // cookieStorage and userData don't do automatic JSON of data
+                                equal(substorage.getItem(test_key), "[object Object]", 'setItem ' + '{foo:"bar"}');
+                            } else {
+                                deepEqual(substorage.getItem(test_key), {foo:"bar"}, 'setItem ' + '{foo:"bar"}');
+                            }
 
                             // Expiry
                             substorage.setItem(test_key, n + 4, -1); // Number
