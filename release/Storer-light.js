@@ -395,7 +395,7 @@ function initStorer(callback, params) {
              * @memberof cookieStorage
              */
             key: function (idx, global) {
-                var cookies = this.getAll(false, global);
+                var cookies = _cookieStorage.getAll(false, global);
                 return cookies[idx] ? cookies[idx].key : undefined;
             },
 
@@ -405,12 +405,12 @@ function initStorer(callback, params) {
              * @memberof cookieStorage
              */
             clear: function (global) {
-                var cookies = this.getAll(false, global),
+                var cookies = _cookieStorage.getAll(false, global),
                     i = cookies.length;
 
                 while (i--) {
                     // Don't use static _removeItemFn reference, because cookieStorage.clear is not handled by _assignPrefix
-                    this.removeItem(cookies[i].key);
+                    _cookieStorage.removeItem(cookies[i].key);
                 }
             },
 
@@ -582,7 +582,7 @@ function initStorer(callback, params) {
              * @memberof memoryStorage
              */
             getItem: function (key) {
-                return _checkEnd(_data[key] && _data[key]._end, _data[key], this.removeItem, key);
+                return _checkEnd(_data[key] && _data[key]._end, _data[key], _memoryStorage.removeItem, key);
             },
 
             /**
